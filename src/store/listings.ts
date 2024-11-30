@@ -1,14 +1,15 @@
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from ".";
-import { Product2 } from "@views/Listings";
+import { Product } from "@views/EditProduct";
 
-const initialState: Product2[] = [];
+
+const initialState: Product[] = [];
 
 const slice = createSlice({
   name: "listing",
   initialState,
   reducers: {
-    updateListings(_, { payload }: PayloadAction<Product2[]>) {
+    updateListings(_, { payload }: PayloadAction<Product[]>) {
       return payload;
     },
     deleteItem(oldListings, { payload }: PayloadAction<string>) {
