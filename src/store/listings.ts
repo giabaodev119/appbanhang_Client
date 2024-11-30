@@ -2,7 +2,6 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from ".";
 import { Product } from "@views/EditProduct";
 
-
 const initialState: Product[] = [];
 
 const slice = createSlice({
