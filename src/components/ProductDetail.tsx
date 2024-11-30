@@ -25,9 +25,9 @@ const ProductDetail: FC<Props> = ({ product }) => {
         Mua ngày: {formatDate(product.date, "dd, LLL, yyyy")}
       </Text>
 
-      <Text style={styles.description}>
+      {product.address &&<Text style={styles.description}>
         {replacedAddress(product.address!)}
-      </Text>
+      </Text>}
       <Text style={styles.description}>{product.description}</Text>
 
       <FormDivider />
