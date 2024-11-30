@@ -24,7 +24,6 @@ const ProductDetail: FC<Props> = ({ product }) => {
       <Text style={styles.date}>
         Mua ngày: {formatDate(product.date, "dd, LLL, yyyy")}
       </Text>
-
       {product.address &&<Text style={styles.description}>
         {replacedAddress(product.address!)}
       </Text>}

@@ -41,6 +41,7 @@ const SignUp: FC<Props> = (props) => {
     setUserInfo({ ...userInfo, [name]: text });
   const handleSubmit = async () => {
     const { values, error } = await yupValidate(newUserSchema, userInfo);
+    
 
     if (error) return showMessage({ message: error, type: "danger" });
 

@@ -26,7 +26,8 @@ const ProductCart: FC<Props> = ({ product, onPress }) => {
       )}
       <Text style={styles.name}>{product.name}</Text>
       <Text style={styles.price}>{formatPrice(product.price)}</Text>
-      {product.address &&<Text style={styles.address}>{splitAddress(product.address)}</Text>}
+      {product.address && <Text style={styles.address}>{splitAddress(product.address)}</Text>}
+    
     </Pressable>
   );
 };
