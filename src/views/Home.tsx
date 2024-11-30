@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView, SafeAreaView } from "react-native";
+import { View, StyleSheet, ScrollView, RefreshControl } from "react-native";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import {
   ActiveChat,
@@ -22,11 +22,11 @@ import { AppStackParamList } from "@navigator/AppNavigator";
 import ShowProduct from "@conponents/SearchProduct";
 
 interface Props {}
-
 const Home: FC<Props> = () => {
   const [products, setProducts] = useState<LatestProduct[]>([]);
   const [productsByAddress, setProductsByAddress] = useState<LatestProduct[]>();
   const [showSearchModal, setShowSearchModal] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const { navigate } = useNavigation<NavigationProp<AppStackParamList>>();
   const { authClient } = useClient();
   const { authState } = useAuth();
@@ -41,6 +41,7 @@ const Home: FC<Props> = () => {
       setProducts(res.products);
     }
   };
+
   const fetchProductByAddress = async () => {
     const res = await runAxiosAsync<{ results: LatestProduct[] }>(
       authClient.get("/product/get-byaddress")
@@ -60,11 +61,17 @@ const Home: FC<Props> = () => {
     }
   };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchProductByAddress();
+    await fetchLatestProduct();
+    await fetchLastChats();
+    setRefreshing(false);
+  };
+
   useEffect(() => {
     const handleApiRequest = async () => {
-      fetchProductByAddress();
-      await fetchLatestProduct();
-      await fetchLastChats();
+      await handleRefresh();
     };
     handleApiRequest();
   }, []);
@@ -94,14 +101,19 @@ const Home: FC<Props> = () => {
           indicate={totalUnreadMessages > 0}
         />
       </View>
-      <ScrollView style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      >
         <CategoryList
           onPress={(category) => navigate("ProductList", { category })}
         />
         {productsByAddress ? (
           <ShowProduct
             title="Sản phẩm gần bạn"
-            data={productsByAddress}
+            data={productsByAddress.slice(0, 4)}
             onPress={({ id }) => navigate("SingleProduct", { id })}
           />
         ) : null}
@@ -127,13 +139,12 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   searchBarContainer: {
-    flex: 6, // Chiếm phần lớn không gian ngang
+    flex: 6,
     marginRight: 13,
     marginLeft: 5,
   },
   searchAddressButtonContainer: {
-    flex: 1, // Chiếm không gian ngang tương đương với chatNotification
-    alignItems: "flex-end", // Canh phải (nếu cần)
+    flex: 1,
   },
 });
 
