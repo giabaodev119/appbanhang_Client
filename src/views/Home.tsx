@@ -1,5 +1,11 @@
 import React, { FC, useEffect, useState } from "react";
-import { View, StyleSheet, ScrollView, RefreshControl } from "react-native";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+  Image,
+} from "react-native";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import {
   ActiveChat,
@@ -20,6 +26,7 @@ import useAuth from "@hooks/useAuth";
 import useClient from "@hooks/useClient";
 import { AppStackParamList } from "@navigator/AppNavigator";
 import ShowProduct from "@conponents/SearchProduct";
+import Swiper from "react-native-swiper"; // Import Swiper
 
 interface Props {}
 const Home: FC<Props> = () => {
@@ -32,6 +39,11 @@ const Home: FC<Props> = () => {
   const { authState } = useAuth();
   const dispatch = useDispatch();
   const totalUnreadMessages = useSelector(getUnreadChatsCount);
+  const banners = [
+    { id: 1, image: require("../../assets/images (2).png") },
+    { id: 2, image: require("../../assets/images (3).png") },
+    { id: 3, image: require("../../assets/images (4).png") },
+  ];
 
   const fetchLatestProduct = async () => {
     const res = await runAxiosAsync<{ products: LatestProduct[] }>(
@@ -107,9 +119,25 @@ const Home: FC<Props> = () => {
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
+        {/* Swiper for auto-sliding images */}
+        <Swiper
+          style={styles.swiper}
+          autoplay
+          autoplayTimeout={3}
+          showsPagination
+        >
+          {banners.map((banner) => (
+            <Image
+              key={banner.id}
+              source={banner.image}
+              style={styles.bannerImage}
+            />
+          ))}
+        </Swiper>
         <CategoryList
           onPress={(category) => navigate("ProductList", { category })}
         />
+
         {productsByAddress ? (
           <ShowProduct
             title="Sản phẩm gần bạn"
@@ -145,6 +173,15 @@ const styles = StyleSheet.create({
   },
   searchAddressButtonContainer: {
     flex: 1,
+  },
+  swiper: {
+    height: 150, // Adjust height as needed
+    marginBottom: 15,
+  },
+  bannerImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
 });
 

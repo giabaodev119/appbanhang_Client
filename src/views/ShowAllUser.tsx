@@ -13,6 +13,7 @@ export type AdminUser = {
   email: string;
   address: string;
   isActive: boolean;
+  isAdmin: boolean;
 };
 
 const ShowAllUser = () => {
@@ -26,7 +27,7 @@ const ShowAllUser = () => {
       authClient.get("/admin/user-listing")
     );
     if (res?.data) {
-      setUsers(res.data);
+      setUsers(res.data.filter((user) => !user.isAdmin));
     }
   };
 
