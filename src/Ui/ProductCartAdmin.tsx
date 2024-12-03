@@ -44,7 +44,7 @@ const ProductCartAdmin: FC<Props> = ({ product, onPress, onLongPress }) => {
           </View>
         </View>
         <Text style={styles.price}>{formatPrice(product.price)}</Text>
-        <Text style={styles.address}>{splitAddress(product.address!)}</Text>
+        {product.address &&<Text style={styles.address}>{splitAddress(product.address!)}</Text>}
       </View>
     </Pressable>
   );

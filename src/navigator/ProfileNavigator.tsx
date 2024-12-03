@@ -7,11 +7,13 @@ import Listings from "@views/Listings";
 import SingleProduct from "@views/SingleProduct";
 import ChatWindow from "@views/ChatWindow";
 import EditProduct, { Product } from "@views/EditProduct";
+import UpdateProfile from "@views/UpdateProfile";
 
 export type ProfileNavigatorParamList = {
   Profile: undefined;
   Chats: undefined;
   Listings: undefined;
+  UpdateProfile: undefined;
   SingleProduct: { product?: Product; id?: string };
   EditProduct: { product: Product };
   ChatWindow: {
@@ -23,12 +25,13 @@ const Stack = createNativeStackNavigator<ProfileNavigatorParamList>();
 
 interface Props {}
 
-const AppNavigator: FC<Props> = (props) => {
+const ProfileNavigator: FC<Props> = (props) => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="Chats" component={Chats} />
       <Stack.Screen name="Listings" component={Listings} />
+      <Stack.Screen name="UpdateProfile" component={UpdateProfile} />
       <Stack.Screen name="SingleProduct" component={SingleProduct} />
       <Stack.Screen name="ChatWindow" component={ChatWindow} />
       <Stack.Screen name="EditProduct" component={EditProduct} />
@@ -40,4 +43,4 @@ const styles = StyleSheet.create({
   container: {},
 });
 
-export default AppNavigator;
+export default ProfileNavigator;

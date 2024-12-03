@@ -4,7 +4,7 @@ import ProvinceOptions from "@conponents/ProvinceOptions";
 import BackButton from "@Ui/BackBotton";
 import size from "@utils/size";
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "react-native-svg";
 import colors from "@utils/color";
@@ -118,13 +118,13 @@ const SearchAddress: React.FC = () => {
           <Text style={styles.searchButtonText}>Tìm kiếm</Text>
         </TouchableOpacity>
         <FormDivider />
-        <View>
+        <ScrollView>
           <ShowProduct
             title="Sản phẩm ở khu vực bạn đã chọn"
             data={searchResults}
             onPress={({ id }) => navigate("SingleProduct", { id })}
           />
-        </View>
+        </ScrollView>
       </View>
     </>
   );

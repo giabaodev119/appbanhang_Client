@@ -62,3 +62,8 @@ export const newProductSchema = yup.object({
     .required("Giá sản phẩm không được để trống!"),
   purchasingDate: yup.date().required("Ngày mua sản phẩm không được để trống!"),
 });
+export const profileSchema = yup.object({
+  name: yup.string().required("Tên không được để trống!"),
+  provinceName: yup.string().required("Tên tỉnh/thành phố không được để trống!"), // New validation rule for provinceName
+  districtName: yup.string().required("Tên quận/huyện không được để trống!"), // New validation rule for districtName
+});
