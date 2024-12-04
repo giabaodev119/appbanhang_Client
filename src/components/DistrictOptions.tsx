@@ -4,6 +4,7 @@ import { View, StyleSheet, StyleProp, ViewStyle } from "react-native";
 import OptionModal from "./OptionModal";
 import AddressOption from "@Ui/AddressOption";
 import axios from "axios";
+import { showMessage } from "react-native-flash-message";
 
 const host = "https://provinces.open-api.vn/api/";
 interface Props {
@@ -45,7 +46,10 @@ const DistrictOptions: FC<Props> = ({ title, onSelect, provinceCode }) => {
           if (provinceCode) {
             fetchAddresses(provinceCode); // Fetch data only if `provinceCode` is defined
           } else {
-            console.warn("Province code is undefined or null.");
+            showMessage({
+              message: "Vui lòng chọn tỉnh thành",
+              type: "warning",
+            });
           }
           setShowAddressModal(true);
         }}
