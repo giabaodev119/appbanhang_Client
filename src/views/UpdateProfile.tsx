@@ -62,12 +62,14 @@ const UpdateProfile: FC<Props> = ({ navigation }) => {
       setAvatar(image);
     }
   };
-  
 
   const handleProfileInformation = async () => {
-    const dataToUpdate = { name: userName, provinceName: city, districtName: district };
-    
-    
+    const dataToUpdate = {
+      name: userName,
+      provinceName: city,
+      districtName: district,
+    };
+
     const { error } = await yupValidate(profileSchema, dataToUpdate);
     if (error) return showMessage({ message: error, type: "danger" });
 
@@ -94,7 +96,6 @@ const UpdateProfile: FC<Props> = ({ navigation }) => {
 
   const handleAvatarUpdate = async () => {
     if (avatar) {
-
       const formData = new FormData();
       formData.append("avatar", {
         name: "Avatar",
@@ -112,7 +113,10 @@ const UpdateProfile: FC<Props> = ({ navigation }) => {
       );
       setBusy(false);
       if (res) {
-        showMessage({ message: "Avatar updated successfully", type: "success" });
+        showMessage({
+          message: "Avatar updated successfully",
+          type: "success",
+        });
         dispatch(updateAuthState({ profile: res.profile, pending: false }));
       }
     }
@@ -120,53 +124,57 @@ const UpdateProfile: FC<Props> = ({ navigation }) => {
   //combine handle handleProfileInformation  and handle avatar update
   const handleOnSubmit = async () => {
     await handleProfileInformation();
-    if (avatar !== profile?.avatar){
-
+    if (avatar !== profile?.avatar) {
       await handleAvatarUpdate();
     }
   };
-
-  
 
   return (
     <>
       <AppHeader backButton={<BackButton />} />
       <View style={styles.container}>
-        <ScrollView >
+        <ScrollView>
           <Text style={styles.title}>Update Profile</Text>
-          <AvatarView
-            uri={avatar}
-            size={80}
-            onPress={handleProfileImageSelection}
-          />
+          <View style={styles.avatarContainer}>
+            <AvatarView
+              uri={avatar}
+              size={100} // Avatar lớn hơn
+              onPress={handleProfileImageSelection}
+              style={styles.avatar} // Thêm viền
+            />
+          </View>
           <FormInput
             placeholder="Name"
             value={userName}
             onChangeText={(name) => setUserName(name)}
           />
-          <FormInput         
+          <FormInput
             placeholder="Email"
             value={email}
             // Disable email input
             editable={false}
           />
-          
+
           <ProvinceOptions
             onSelect={(province: tinh) => {
               setProvinceCode(province.code);
               setCity(province.name);
-              setDistrict(""); // Reset district when the city changes
+              setDistrict("");
             }}
-            title={city || "Chọn tỉnh/thành phố"}
+            title={city || "Select City"}
+            style={styles.dropdown} // Thêm style cho dropdown
           />
           <DistrictOptions
             onSelect={(selectedDistrict) => {
               setDistrict(selectedDistrict);
             }}
-            title={district || "Chọn quận/huyện"}
-            provinceCode={provinceCode} // Filter districts by selected province
+            title={district || "Select District"}
+            provinceCode={provinceCode}
+            style={styles.dropdown}
           />
-          <AppButton title="Update Profile" onPress={handleOnSubmit} />
+          <Pressable style={styles.button} onPress={handleOnSubmit}>
+            <Text style={styles.buttonText}>Cập nhật thông tin của bạn</Text>
+          </Pressable>
         </ScrollView>
       </View>
       <LoadingSpinner visible={busy} />
@@ -177,23 +185,48 @@ const UpdateProfile: FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: size.padding,
+    padding: size.padding * 1.5,
+    backgroundColor: colors.white, // Nền sáng
   },
   title: {
-    fontWeight: "600",
+    fontWeight: "700",
     textAlign: "center",
-    fontSize: 24,
-    color: colors.primary,
-    marginBottom: 10,
+    fontSize: 28,
+    color: colors.textMessage, // Màu nổi bật hơn
+    marginBottom: 20,
   },
   input: {
-    marginVertical: 10, // Vertical spacing between inputs
+    marginVertical: 15,
   },
   button: {
-    marginTop: 20, // Space above the button
+    marginTop: 30,
+    paddingVertical: 12,
+    borderRadius: 8,
+    backgroundColor: colors.primary, // Màu chủ đạo
+    alignItems: "center",
+  },
+  buttonText: {
+    color: colors.white, // Chữ trắng
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  avatarContainer: {
+    alignItems: "center",
+    marginBottom: 25,
   },
   avatar: {
-    marginBottom: 20, // Space below the avatar
+    borderWidth: 2,
+    borderColor: colors.borderColor, // Viền cho avatar
+    padding: 5,
+    borderRadius: 50,
+  },
+  dropdown: {
+    marginVertical: 10,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: colors.borderColor,
+    borderRadius: 8,
+    backgroundColor: colors.white,
   },
 });
 

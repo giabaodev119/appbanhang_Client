@@ -1,5 +1,12 @@
 import { FC } from "react";
-import { View, StyleSheet, Image, Pressable } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Image,
+  Pressable,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import colors from "@utils/color";
 
@@ -7,11 +14,12 @@ interface Props {
   uri?: string;
   size?: number;
   onPress?(): void;
+  style?: StyleProp<ViewStyle>;
 }
 const iconContainerFactor = 0.8;
 const iconSizeFactor = 0.8;
 
-const AvatarView: FC<Props> = ({ size = 50, uri, onPress }) => {
+const AvatarView: FC<Props> = ({ size = 50, uri, onPress, style }) => {
   const iconContainerSize = size * iconContainerFactor;
   const iconSize = size * iconSizeFactor;
 
