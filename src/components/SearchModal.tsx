@@ -11,6 +11,7 @@ import {
   Platform,
   Image,
   SafeAreaView,
+  ScrollView,
 } from "react-native";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import SearchBar from "./SearchBar";
@@ -135,7 +136,7 @@ const SearchModal: FC<Props> = ({ visible, onClose, onPress }) => {
             </View>
           ) : null}
 
-          <View style={{ paddingBottom: keyboardHeight }}>
+          <ScrollView style={{ paddingBottom: keyboardHeight }}>
             <FlatList
               data={!busy ? results : []}
               renderItem={({ item }) => (
@@ -158,7 +159,7 @@ const SearchModal: FC<Props> = ({ visible, onClose, onPress }) => {
                 ) : null
               }
             />
-          </View>
+          </ScrollView>
         </View>
       </SafeAreaView>
     </Modal>

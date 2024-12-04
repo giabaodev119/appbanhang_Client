@@ -1,59 +1,46 @@
-import ProfileOptionListItem from "@conponents/ProfileOptionListItem";
-import useAuth from "@hooks/useAuth";
-import { ProfileNavigatorParamList } from "@navigator/ProfileNavigator";
+import React, { FC, useEffect, useState } from "react";
+import { View, Text, ScrollView, StyleSheet, Pressable, RefreshControl } from "react-native";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import AvatarView from "@Ui/AvatarView";
-import FormDivider from "@Ui/FormDivider";
-import colors from "@utils/color";
-import size from "@utils/size";
-import { FC, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { AntDesign } from "@expo/vector-icons";
-import {
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  RefreshControl,
-} from "react-native";
+import { showMessage } from "react-native-flash-message";
+import mime from "mime";
+import useAuth from "@hooks/useAuth";
 import useClient from "@hooks/useClient";
 import { runAxiosAsync } from "@api/runAxiosAsync";
-import { ProfileRes } from "@navigator/index";
-import { useDispatch, useSelector } from "react-redux";
 import { updateAuthState } from "@store/auth";
-import { showMessage } from "react-native-flash-message";
+import { getUnreadChatsCount, addNewActiveChats, ActiveChat } from "@store/chats";
+import { ProfileNavigatorParamList } from "@navigator/ProfileNavigator";
+import AvatarView from "@Ui/AvatarView";
+import FormDivider from "@Ui/FormDivider";
+import ProfileOptionListItem from "@conponents/ProfileOptionListItem";
+import colors from "@utils/color";
+import size from "@utils/size";
 import { selectImages } from "@utils/helper";
-import mime from "mime";
-import LoadingSpinner from "@Ui/LoadingSpinner";
-import {
-  ActiveChat,
-  addNewActiveChats,
-  getUnreadChatsCount,
-} from "@store/chats";
+import LoadingModal from "@Ui/LoadingSpinner";
+import { ProfileRes } from "@navigator/index";
+
 
 interface Props {}
-
 const Profile: FC<Props> = (props) => {
-  const { navigate } =
-    useNavigation<NavigationProp<ProfileNavigatorParamList>>();
+  const { navigate } = useNavigation<NavigationProp<ProfileNavigatorParamList>>();
   const { authState, signOut } = useAuth();
   const { profile } = authState;
-  const [userName, setUserName] = useState(profile?.name || "");
   const [busy, setBusy] = useState(false);
   const [updatingAvatar, setUpdatingAvatar] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { authClient } = useClient();
   const dispatch = useDispatch();
   const totalUnreadMessages = useSelector(getUnreadChatsCount);
-  const isNameChanged =
-    profile?.name !== userName && userName.trim().length >= 3;
 
   const onMessagePress = () => {
     navigate("Chats");
   };
   const onListingPress = () => {
     navigate("Listings");
+  };
+  const onUpdateProfilePress = () => {
+    navigate("UpdateProfile");
   };
   const fetchProfile = async () => {
     setRefreshing(true);
@@ -119,24 +106,6 @@ const Profile: FC<Props> = (props) => {
     }
   };
 
-  const updateProfile = async () => {
-    const res = await runAxiosAsync<{ profile: ProfileRes }>(
-      authClient.patch("/auth/update-profile", { name: userName })
-    );
-    if (res) {
-      showMessage({
-        message: "Tên của bạn đã được thay đổi thành công",
-        type: "success",
-      });
-      dispatch(
-        updateAuthState({
-          pending: false,
-          profile: { ...profile!, ...res.profile },
-        })
-      );
-    }
-  };
-
   useEffect(() => {
     const handleApiRequest = async () => {
       await fetchLastChats();
@@ -172,18 +141,11 @@ const Profile: FC<Props> = (props) => {
         />
         <View style={styles.profileInfo}>
           <View style={styles.nameContainer}>
-            <TextInput
-              value={userName}
-              onChangeText={(text) => setUserName(text)}
-              style={styles.name}
-            />
-            {isNameChanged && (
-              <Pressable onPress={updateProfile}>
-                <AntDesign name="check" size={24} color={colors.primary} />
-              </Pressable>
-            )}
+            <Text style={styles.name}>{profile?.name}</Text>
+            <Pressable onPress={onUpdateProfilePress}>
+              <AntDesign name="edit" size={24} color={colors.primary} />
+            </Pressable>
           </View>
-
           <Text style={styles.email}>{profile?.email}</Text>
         </View>
       </View>
@@ -206,7 +168,7 @@ const Profile: FC<Props> = (props) => {
         title="Đăng xuất"
         onPress={signOut}
       />
-      <LoadingSpinner visible={updatingAvatar} />
+      <LoadingModal visible={updatingAvatar} />
     </ScrollView>
   );
 };
