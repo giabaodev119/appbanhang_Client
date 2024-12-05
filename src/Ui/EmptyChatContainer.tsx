@@ -42,6 +42,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 20,
     fontWeight: "500",
+    transform: [{ scaleX: -1 }], 
   },
 });
 

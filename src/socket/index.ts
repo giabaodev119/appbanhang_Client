@@ -65,6 +65,29 @@ export const handleSocketConnection = (
       })
     );
   });
+  // handle chat:image event
+  socket.on("chat:image", (data: NewMessageResponse) => {
+    const { conversationId, from, message } = data;
+
+    dispatch(
+      updateConversation({
+        conversationId,
+        chat: message,
+        peerProfile: from,
+      })
+    );
+
+    dispatch(
+      updateActiveChat({
+        id: data.conversationId,
+        lastMessage: data.message.text,
+        peerProfile: data.message.user,
+        timestamp: data.message.time,
+        unreadChatCounts: 1,
+      })
+    );
+  });
+
 
   socket.on("chat:seen", (seemData: SeenData) => {
     dispatch(updateChatViewed(seemData));
