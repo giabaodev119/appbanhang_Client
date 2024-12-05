@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import colors from "@utils/color";
-import size from "@utils/size";
 
 interface Props {
   indicate?: boolean;
