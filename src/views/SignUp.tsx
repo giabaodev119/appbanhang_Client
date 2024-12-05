@@ -86,12 +86,12 @@ const SignUp: FC<Props> = (props) => {
               setTinhInfo(province);
               setUserInfo({ ...userInfo, provinceName: province.name });
             }}
-            title={provinceName || "Chọn tỉnh/thành phố bạn muốn mua hàng"}
+            title={provinceName || "Chọn tỉnh/thành phố "}
           />
 
           <DistrictOptions
             onSelect={handleChange("districtName")}
-            title={districtName || "Chọn quận/huyện bạn muốn mua hàng"}
+            title={districtName || "Chọn quận/huyện "}
             provinceCode={provinceCode}
           />
           <AppButton active={!busy} title="Đăng kí" onPress={handleSubmit} />

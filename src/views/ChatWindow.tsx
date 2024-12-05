@@ -14,17 +14,19 @@ import BackButton from "@Ui/BackBotton";
 import EmptyChatContainer from "@Ui/EmptyChatContainer";
 import PeerProfile from "@Ui/PeerProfile";
 import { FC, useCallback, useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
-import { GiftedChat, IMessage } from "react-native-gifted-chat";
+import { View, StyleSheet, Button, Image } from "react-native";
+import { GiftedChat, IMessage, MessageImageProps } from "react-native-gifted-chat";
 import { useDispatch, useSelector } from "react-redux";
 import socket, { NewMessageResponse } from "src/socket";
 import EmptyView from "./EmptyView";
 import { useFocusEffect } from "@react-navigation/native";
 import { updateActiveChat } from "@store/chats";
+import { selectImages } from "@utils/helper";
+import mime from "mime";
 
 type Props = NativeStackScreenProps<AppStackParamList, "ChatWindow">;
 
-type OutGoingMessage = {
+type OutGoingImageMessage = {
   message: {
     id: string;
     time: string;
@@ -43,6 +45,7 @@ const getTime = (value: IMessage["createdAt"]) => {
   if (value instanceof Date) return value.toISOString();
   return new Date(value).toISOString();
 };
+
 const formatConversationToIMessage = (value?: Conversation): IMessage[] => {
   const formattedValues = value?.chats.map((chat) => {
     return {
@@ -55,6 +58,7 @@ const formatConversationToIMessage = (value?: Conversation): IMessage[] => {
         name: chat.user.name,
         avatar: chat.user.avatar,
       },
+      image: chat.text.startsWith("http") ? chat.text : undefined, // Check if the message is an image
     };
   });
 
@@ -74,6 +78,7 @@ const ChatWindow: FC<Props> = ({ route }) => {
   const { authClient } = useClient();
   const [fetchingChats, setFetchingChats] = useState(false);
   const [typing, setTyping] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const profile = authState.profile;
 
@@ -81,7 +86,7 @@ const ChatWindow: FC<Props> = ({ route }) => {
     if (!profile) return;
     const currentMessage = messages[messages.length - 1];
 
-    const newMessage: OutGoingMessage = {
+    const newMessage = {
       message: {
         id: currentMessage._id.toString(),
         text: currentMessage.text,
@@ -95,6 +100,7 @@ const ChatWindow: FC<Props> = ({ route }) => {
       conversationId,
       to: peerProfile.id,
     };
+
     dispatch(
       updateConversation({
         conversationId,
@@ -114,6 +120,94 @@ const ChatWindow: FC<Props> = ({ route }) => {
     );
 
     socket.emit("chat:new", newMessage);
+  };
+
+  const handleOnImageSend = (imageMessage: IMessage) => {
+    if (!profile) return;
+    const newImageMessage: OutGoingImageMessage = {
+      message: {
+        id: imageMessage._id.toString(),
+        text: imageMessage.text,
+        time: getTime(imageMessage.createdAt),
+        user: {
+          id: profile.id,
+          name: profile.name,
+          avatar: profile.avatar,
+        },
+      },
+      conversationId,
+      to: peerProfile.id,
+    };
+
+    dispatch(
+      updateConversation({
+        conversationId,
+        chat: { ...newImageMessage.message, viewed: false },
+        peerProfile,
+      })
+    );
+
+    dispatch(
+      updateActiveChat({
+        id: conversationId,
+        lastMessage: newImageMessage.message.text,
+        peerProfile,
+        timestamp: newImageMessage.message.time,
+        unreadChatCounts: 0,
+      })
+    );
+
+    socket.emit("chat:image", newImageMessage);
+  };
+
+  const handleImageUpload = async () => {
+    if (!profile) return;
+    const [image] = await selectImages({
+      allowsMultipleSelection: false,
+      allowsEditing: true,
+      aspect: [1, 1],
+    });
+    if (image) {
+      setSelectedImage(image);
+
+      const imageMessage: IMessage = {
+        _id: new Date().getTime().toString(),
+        text: image, // Assuming the image URI is used as the message text
+        createdAt: new Date(),
+        user: {
+          _id: profile.id,
+          name: profile.name,
+          avatar: profile.avatar,
+        },
+        image, // Add the image URI to the message
+      };
+
+      const formData = new FormData();
+      formData.append("image", {
+        name: "Image",
+        uri: image,
+        type: mime.getType(image),
+      } as any);
+
+
+      const response = await runAxiosAsync<{ image: { url: string; id: string } }>(
+        authClient.post(`/conversation/${conversationId}/upload-image`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+      );
+
+      if (response?.image?.url) {
+        const updatedImageMessage = {
+          ...imageMessage,
+          text: response.image.url, // Update the message text with the image URL
+          image: response.image.url, // Update the image property with the image URL
+        };
+
+        handleOnImageSend(updatedImageMessage);
+      }
+    }
   };
 
   const emitTypingEnd = (timeout: number) => {
@@ -181,6 +275,15 @@ const ChatWindow: FC<Props> = ({ route }) => {
     }, [])
   );
 
+  const renderMessageImage = (props: MessageImageProps<IMessage>) => {
+    return (
+      <Image
+        source={{ uri: props.currentMessage.image }}
+        style={styles.customMessageImage}
+      />
+    );
+  };
+
   if (!profile) return null;
 
   if (fetchingChats) return <EmptyView title="Hãy đợi..." />;
@@ -204,7 +307,10 @@ const ChatWindow: FC<Props> = ({ route }) => {
         renderChatEmpty={() => <EmptyChatContainer />}
         onInputTextChanged={handleOnInputChange}
         isTyping={typing}
+        renderMessageImage={renderMessageImage} // Add the renderMessageImage prop
       />
+      
+      <Button title="Send Image" onPress={handleImageUpload} />
     </View>
   );
 };
@@ -212,6 +318,18 @@ const ChatWindow: FC<Props> = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  selectedImage: {
+    width: 200,
+    height: 200,
+    alignSelf: "center",
+    margin: 10,
+  },
+  customMessageImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 10,
+    margin: 5,
   },
 });
 
