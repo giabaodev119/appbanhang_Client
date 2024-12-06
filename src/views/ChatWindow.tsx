@@ -15,7 +15,12 @@ import EmptyChatContainer from "@Ui/EmptyChatContainer";
 import PeerProfile from "@Ui/PeerProfile";
 import { FC, useCallback, useEffect, useState } from "react";
 import { View, StyleSheet, Button, Image } from "react-native";
-import { GiftedChat, IMessage, MessageImageProps } from "react-native-gifted-chat";
+import {
+  GiftedChat,
+  IMessage,
+  InputToolbar,
+  MessageImageProps,
+} from "react-native-gifted-chat";
 import { useDispatch, useSelector } from "react-redux";
 import socket, { NewMessageResponse } from "src/socket";
 import EmptyView from "./EmptyView";
@@ -189,13 +194,18 @@ const ChatWindow: FC<Props> = ({ route }) => {
         type: mime.getType(image),
       } as any);
 
-
-      const response = await runAxiosAsync<{ image: { url: string; id: string } }>(
-        authClient.post(`/conversation/${conversationId}/upload-image`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        })
+      const response = await runAxiosAsync<{
+        image: { url: string; id: string };
+      }>(
+        authClient.post(
+          `/conversation/${conversationId}/upload-image`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        )
       );
 
       if (response?.image?.url) {
@@ -307,10 +317,20 @@ const ChatWindow: FC<Props> = ({ route }) => {
         renderChatEmpty={() => <EmptyChatContainer />}
         onInputTextChanged={handleOnInputChange}
         isTyping={typing}
-        renderMessageImage={renderMessageImage} // Add the renderMessageImage prop
+        renderMessageImage={renderMessageImage}
+        renderInputToolbar={(props) => (
+          <View style={styles.inputContainer}>
+            <View style={styles.inputWrapper}>
+              <InputToolbar
+                {...props}
+                containerStyle={styles.inputToolbar}
+                primaryStyle={styles.inputPrimaryStyle}
+              />
+            </View>
+            <Button title="📷" onPress={handleImageUpload} />
+          </View>
+        )}
       />
-      
-      <Button title="Send Image" onPress={handleImageUpload} />
     </View>
   );
 };
@@ -319,17 +339,39 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  selectedImage: {
-    width: 200,
-    height: 200,
-    alignSelf: "center",
-    margin: 10,
-  },
   customMessageImage: {
     width: 150,
     height: 150,
     borderRadius: 10,
     margin: 5,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 8,
+    backgroundColor: "#f9f9f9",
+    borderTopWidth: 1,
+    borderColor: "#e0e0e0",
+  },
+  inputWrapper: {
+    flex: 1,
+    marginRight: 8,
+    borderRadius: 25,
+    backgroundColor: "#ffffff",
+    borderWidth: 1,
+    borderColor: "#dddddd",
+    overflow: "hidden",
+  },
+  inputToolbar: {
+    borderRadius: 25,
+    backgroundColor: "#ffffff",
+    borderWidth: 0,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  inputPrimaryStyle: {
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
