@@ -71,25 +71,35 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: itemWidth,
+    paddingVertical: 10,
+    backgroundColor: colors.white, // Nền sáng
+    borderRadius: 8, // Góc bo mềm mại
+    shadowColor: colors.backDropDark, // Hiệu ứng bóng
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2, // Hiệu ứng nổi trên Android
+    marginVertical: 5,
   },
   chatInfo: {
-    width: itemWidth - profileImageSize,
+    width: itemWidth - profileImageSize - size.padding,
     paddingLeft: size.padding,
   },
   name: {
-    fontWeight: "bold",
+    fontWeight: "600",
     fontSize: 16,
     color: colors.primary,
     paddingRight: size.padding,
   },
   commonText: {
-    fontSize: 12,
-    color: colors.primary,
+    fontSize: 14,
+    color: colors.textMessage, // Tông xám đậm để rõ hơn
   },
   flexJustifyBetween: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginBottom: 5,
   },
   flex1: {
     flex: 1,
@@ -97,29 +107,36 @@ const styles = StyleSheet.create({
   msgIndicatorCount: {
     fontSize: 12,
     color: colors.white,
+    fontWeight: "600",
   },
   msgIndicator: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     backgroundColor: colors.active,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: colors.active, // Hiệu ứng ánh sáng cho vòng tròn
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
   },
   activeText: {
     fontSize: 12,
     color: colors.active,
+    fontWeight: "500",
   },
   inActiveText: {
     fontSize: 12,
-    color: colors.white,
+    color: colors.deActive, // Tông xám nhạt hơn
   },
   separator: {
     width: separatorWidth,
-    backgroundColor: colors.deActive,
-    height: 1,
+    backgroundColor: colors.borderColor,
+    height: 0.5,
     alignSelf: "flex-end",
-    marginVertical: 15,
+    marginVertical: 10,
+    borderRadius: 1, // Đường phân cách mềm mại hơn
   },
 });
 

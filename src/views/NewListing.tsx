@@ -160,12 +160,12 @@ const NewListing: FC<Props> = (props) => {
             setTinhInfo(province);
             setProductInfo({ ...productInfo, provinceName: province.name });
           }}
-          title={provinceName || "Chọn tỉnh/thành phố bạn muốn mua hàng"}
+          title={provinceName || "Chọn tỉnh/thành phố bạn muốn bán hàng"}
         />
 
         <DistrictOptions
           onSelect={handleChange("districtName")}
-          title={districtName || "Chọn quận/huyện bạn muốn mua hàng"}
+          title={districtName || "Chọn quận/huyện bạn muốn bán hàng"}
           provinceCode={provinceCode}
         />
 
@@ -199,41 +199,76 @@ const NewListing: FC<Props> = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 15,
+    padding: 20,
     flex: 1,
   },
-  imagesContainer: { flexDirection: "row" },
+  imagesContainer: {
+    flexDirection: "row",
+    marginBottom: 15,
+  },
   btnTitle: {
-    color: colors.primary,
-    marginTop: 5,
+    color: colors.active,
+    marginTop: 8,
+    fontWeight: "600",
+    fontSize: 14,
   },
   iconContainer: {
     alignItems: "center",
     justifyContent: "center",
-    width: 70,
-    height: 70,
-    borderWidth: 2,
-    borderColor: colors.primary,
-    borderRadius: 7,
+    width: 80,
+    height: 80,
+    borderWidth: 1.5,
+    borderColor: colors.active,
+    borderRadius: 10,
+    backgroundColor: colors.white, // Nền trắng cho nổi bật
+    shadowColor: colors.backDropDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3, // Hiệu ứng nổi trên Android
   },
   fileSelector: {
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 15,
-    alignSelf: "flex-start",
+    marginRight: 10,
   },
-
   selectedImage: {
     width: 70,
     height: 70,
-    borderRadius: 7,
+    borderRadius: 10,
     marginLeft: 5,
+    borderWidth: 1,
+    borderColor: colors.borderColor,
   },
   imageOption: {
-    fontWeight: "600",
-    fontSize: 18,
-    color: colors.primary,
+    fontWeight: "500",
+    fontSize: 16,
+    color: colors.textMessage,
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.borderColor,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: colors.borderColor,
+    backgroundColor: colors.white,
+    borderRadius: 8,
     padding: 10,
+    fontSize: 16,
+    color: colors.textMessage,
+    marginBottom: 15,
+  },
+  button: {
+    backgroundColor: colors.active,
+    paddingVertical: 15,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
 

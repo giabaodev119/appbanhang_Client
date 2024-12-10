@@ -6,7 +6,7 @@ import { LatestProduct } from "./LatesProductList";
 
 interface Props {
   data: LatestProduct[];
-  onPress(product: LatestProduct): void;
+  onPress?(product: LatestProduct): void;
   title: string;
 }
 

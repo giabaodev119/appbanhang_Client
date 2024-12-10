@@ -5,7 +5,7 @@ import ProductCart from "@Ui/ProductCart";
 
 interface Props {
   data: LatestProduct[];
-  onPress(item: LatestProduct): void;
+  onPress?(item: LatestProduct): void;
 }
 
 const ProductGridView: FC<Props> = ({ data, onPress }) => {

@@ -1,5 +1,12 @@
 import React, { FC, useEffect, useState } from "react";
-import { View, Text, ScrollView, StyleSheet, Pressable, RefreshControl } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  Pressable,
+  RefreshControl,
+} from "react-native";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { AntDesign } from "@expo/vector-icons";
@@ -9,7 +16,11 @@ import useAuth from "@hooks/useAuth";
 import useClient from "@hooks/useClient";
 import { runAxiosAsync } from "@api/runAxiosAsync";
 import { updateAuthState } from "@store/auth";
-import { getUnreadChatsCount, addNewActiveChats, ActiveChat } from "@store/chats";
+import {
+  getUnreadChatsCount,
+  addNewActiveChats,
+  ActiveChat,
+} from "@store/chats";
 import { ProfileNavigatorParamList } from "@navigator/ProfileNavigator";
 import AvatarView from "@Ui/AvatarView";
 import FormDivider from "@Ui/FormDivider";
@@ -20,10 +31,10 @@ import { selectImages } from "@utils/helper";
 import LoadingModal from "@Ui/LoadingSpinner";
 import { ProfileRes } from "@navigator/index";
 
-
 interface Props {}
 const Profile: FC<Props> = (props) => {
-  const { navigate } = useNavigation<NavigationProp<ProfileNavigatorParamList>>();
+  const { navigate } =
+    useNavigation<NavigationProp<ProfileNavigatorParamList>>();
   const { authState, signOut } = useAuth();
   const { profile } = authState;
   const [busy, setBusy] = useState(false);
@@ -175,42 +186,92 @@ const Profile: FC<Props> = (props) => {
 
 const styles = StyleSheet.create({
   verificationLinkContainer: {
-    padding: 10,
+    padding: 15,
     backgroundColor: colors.deActive,
     marginVertical: 10,
-    borderRadius: 5,
+    borderRadius: 10,
+    shadowColor: colors.backDropDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   verificationTitle: {
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.primary,
     textAlign: "center",
+    fontSize: 16,
   },
   verificationLink: {
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.active,
     textAlign: "center",
-    paddingTop: 5,
+    paddingTop: 8,
+    fontSize: 14,
+    textDecorationLine: "underline",
   },
   container: {
     padding: size.padding,
     flex: 1,
+    backgroundColor: colors.lightGrey,
   },
-  marginBottom: { marginBottom: 15 },
+  marginBottom: {
+    marginBottom: 20,
+  },
   name: {
     color: colors.primary,
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
   },
-  email: { color: colors.primary, paddingTop: 2 },
-  profileContainer: { flexDirection: "row", alignItems: "center" },
+  email: {
+    color: colors.textMessage,
+    paddingTop: 4,
+    fontSize: 14,
+    fontStyle: "italic",
+  },
+  profileContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    padding: 10,
+    shadowColor: colors.backDropDark,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: colors.borderColor,
+  },
   profileInfo: {
     flex: 1,
-    padding: size.padding,
+    paddingLeft: size.padding,
   },
   nameContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  optionContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: colors.white,
+    borderRadius: 8,
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    marginBottom: 12,
+    shadowColor: colors.backDropDark,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+    borderWidth: 1,
+    borderColor: colors.borderColor,
+  },
+  optionIcon: {
+    marginRight: 10,
+    color: colors.primary,
   },
 });
 

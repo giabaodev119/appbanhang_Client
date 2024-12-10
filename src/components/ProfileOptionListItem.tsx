@@ -26,7 +26,14 @@ const ProfileOptionListItem: FC<Props> = ({
   active,
 }) => {
   return (
-    <Pressable onPress={onPress} style={[styles.container, style]}>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.container,
+        style,
+        pressed && styles.pressed,
+      ]}
+    >
       <View style={styles.buttonContainer}>
         <AntDesign
           name={antIconName as any}
@@ -49,15 +56,26 @@ const ProfileOptionListItem: FC<Props> = ({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10,
+    padding: 15,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    backgroundColor: colors.white,
+    borderRadius: 8,
+    shadowColor: colors.backDropDark,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    marginVertical: 8,
+  },
+  pressed: {
+    backgroundColor: colors.lightGrey,
   },
   indicator: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     backgroundColor: colors.active,
   },
   buttonContainer: {
@@ -65,8 +83,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 20,
-    paddingLeft: 10,
+    fontSize: 18,
+    paddingLeft: 15,
+    fontWeight: "500",
   },
 });
 

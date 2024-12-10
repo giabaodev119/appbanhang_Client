@@ -16,6 +16,7 @@ import size from "@utils/size";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { ProfileNavigatorParamList } from "@navigator/ProfileNavigator";
 import { runAxiosAsync } from "@api/runAxiosAsync";
+import colors from "@utils/color";
 
 interface Props {}
 
@@ -67,7 +68,16 @@ const Chats: FC<Props> = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: size.padding,
+    paddingVertical: 10,
+    paddingHorizontal: size.padding,
+    backgroundColor: colors.white, // Nền trắng để danh sách nổi bật
+    flexGrow: 1, // Đảm bảo FlatList chiếm toàn bộ chiều cao
+  },
+  emptyText: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: colors.textMessage, // Màu nhấn cho thông báo
+    marginTop: 10,
   },
 });
 

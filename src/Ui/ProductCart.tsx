@@ -7,12 +7,15 @@ import { LatestProduct } from "@conponents/LatesProductList";
 
 interface Props {
   product: LatestProduct;
-  onPress(item: LatestProduct): void;
+  onPress?(item: LatestProduct): void;
 }
 
 const ProductCart: FC<Props> = ({ product, onPress }) => {
   return (
-    <Pressable onPress={() => onPress(product)} style={styles.productContainer}>
+    <Pressable
+      onPress={() => onPress!(product)}
+      style={styles.productContainer}
+    >
       {product.thumbnail ? (
         <Image source={{ uri: product.thumbnail }} style={styles.thumbnail} />
       ) : (
@@ -24,10 +27,13 @@ const ProductCart: FC<Props> = ({ product, onPress }) => {
           />
         </View>
       )}
-      <Text style={styles.name}>{product.name}</Text>
+      <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
+        {product.name}
+      </Text>
       <Text style={styles.price}>{formatPrice(product.price)}</Text>
-      {product.address && <Text style={styles.address}>{splitAddress(product.address)}</Text>}
-    
+      {product.address && (
+        <Text style={styles.address}>{splitAddress(product.address)}</Text>
+      )}
     </Pressable>
   );
 };

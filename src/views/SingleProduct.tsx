@@ -140,6 +140,7 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.lightGrey, // Nền sáng nhẹ
   },
   option: {
     flexDirection: "row",

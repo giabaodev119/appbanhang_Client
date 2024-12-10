@@ -27,6 +27,7 @@ import useClient from "@hooks/useClient";
 import { AppStackParamList } from "@navigator/AppNavigator";
 import ShowProduct from "@conponents/SearchProduct";
 import Swiper from "react-native-swiper"; // Import Swiper
+import colors from "@utils/color";
 
 interface Props {}
 const Home: FC<Props> = () => {
@@ -60,6 +61,9 @@ const Home: FC<Props> = () => {
     );
     if (res?.results) {
       setProductsByAddress(res.results);
+      console.log(res.results);
+    } else {
+      return null;
     }
   };
 
@@ -97,6 +101,7 @@ const Home: FC<Props> = () => {
 
   return (
     <>
+      {/* Header */}
       <View style={styles.headerContainer}>
         <View style={styles.searchBarContainer}>
           <SearchBar asButton onPress={() => setShowSearchModal(true)} />
@@ -113,13 +118,15 @@ const Home: FC<Props> = () => {
           indicate={totalUnreadMessages > 0}
         />
       </View>
+
+      {/* Main Content */}
       <ScrollView
         style={styles.container}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
-        {/* Swiper for auto-sliding images */}
+        {/* Banner Swiper */}
         <Swiper
           style={styles.swiper}
           autoplay
@@ -134,22 +141,35 @@ const Home: FC<Props> = () => {
             />
           ))}
         </Swiper>
-        <CategoryList
-          onPress={(category) => navigate("ProductList", { category })}
-        />
 
-        {productsByAddress ? (
-          <ShowProduct
-            title="Sản phẩm gần bạn"
-            data={productsByAddress.slice(0, 4)}
+        {/* Categories */}
+        <View style={styles.sectionContainer}>
+          <CategoryList
+            onPress={(category) => navigate("ProductList", { category })}
+          />
+        </View>
+
+        {/* Nearby Products */}
+        {productsByAddress && productsByAddress.length > 0 && (
+          <View style={styles.sectionContainer}>
+            <ShowProduct
+              title="Sản phẩm gần bạn"
+              data={productsByAddress.slice(0, 4)}
+              onPress={({ id }) => navigate("SingleProduct", { id })}
+            />
+          </View>
+        )}
+
+        {/* Latest Products */}
+        <View style={styles.sectionContainer}>
+          <LatesProductList
+            data={products}
             onPress={({ id }) => navigate("SingleProduct", { id })}
           />
-        ) : null}
-        <LatesProductList
-          data={products}
-          onPress={({ id }) => navigate("SingleProduct", { id })}
-        />
+        </View>
       </ScrollView>
+
+      {/* Search Modal */}
       <SearchModal visible={showSearchModal} onClose={setShowSearchModal} />
     </>
   );
@@ -157,32 +177,52 @@ const Home: FC<Props> = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: size.padding,
+    paddingHorizontal: size.padding,
     flex: 1,
+    backgroundColor: colors.lightGrey, // Background màu nhẹ nhàng
   },
   headerContainer: {
     flexDirection: "row",
+    alignItems: "center",
     paddingTop: 15,
-    marginLeft: 12,
-    marginBottom: 5,
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
   searchBarContainer: {
     flex: 6,
-    marginRight: 13,
-    marginLeft: 5,
+    marginRight: 10,
+    marginLeft: 10,
   },
   searchAddressButtonContainer: {
     flex: 1,
   },
   swiper: {
-    height: 150, // Adjust height as needed
-    marginBottom: 15,
+    height: 160,
+    marginBottom: 20,
+    borderRadius: 10,
+    overflow: "hidden", // Ẩn viền của ảnh bo tròn
+    shadowColor: colors.backDropDark,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 4,
   },
   bannerImage: {
     width: "100%",
     height: "100%",
     resizeMode: "cover",
   },
+  sectionContainer: {
+    marginBottom: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    backgroundColor: colors.white,
+    borderRadius: 10,
+    shadowColor: colors.backDropDark,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
 });
-
 export default Home;

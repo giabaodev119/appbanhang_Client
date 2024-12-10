@@ -23,6 +23,7 @@ export type AdminUser = {
   address: string;
   isActive: boolean;
   isAdmin: boolean;
+  createdAt: string;
 };
 
 const ShowAllUser = () => {

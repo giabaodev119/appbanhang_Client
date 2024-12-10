@@ -20,7 +20,13 @@ interface Props {
   value?: string;
 }
 
-const SearchBar: FC<Props> = ({ asButton, onChange, value, onPress, onSubmit }) => {
+const SearchBar: FC<Props> = ({
+  asButton,
+  onChange,
+  value,
+  onPress,
+  onSubmit,
+}) => {
   return (
     <View style={styles.container}>
       <Pressable onPress={onPress} style={styles.textInputContainer}>
@@ -51,7 +57,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     borderColor: colors.primary,
-    padding: 10,
+    padding: 8,
     alignItems: "center",
   },
   textInputContainer: {

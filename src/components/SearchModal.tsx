@@ -136,30 +136,31 @@ const SearchModal: FC<Props> = ({ visible, onClose, onPress }) => {
             </View>
           ) : null}
 
-          <ScrollView style={{ paddingBottom: keyboardHeight }}>
-            <FlatList
-              data={!busy ? results : []}
-              renderItem={({ item }) => (
-                <Pressable
-                  onPress={() => handleOnResultPress(item)}
-                  style={styles.searchResultItem}
-                >
-                  <Image
-                    source={{ uri: item.thumbnail }}
-                    style={styles.thumbnail || undefined}
-                  />
-                  <Text style={styles.suggestionListItem}>{item.name}</Text>
-                </Pressable>
-              )}
-              keyExtractor={(item) => item.id.toString()}
-              contentContainerStyle={styles.suggestionList}
-              ListEmptyComponent={
-                notFound ? (
-                  <EmptyView title="Không tìm thấy sản phẩm nào..." />
-                ) : null
-              }
-            />
-          </ScrollView>
+          <FlatList
+            data={!busy ? results : []}
+            renderItem={({ item }) => (
+              <Pressable
+                onPress={() => handleOnResultPress(item)}
+                style={styles.searchResultItem}
+              >
+                <Image
+                  source={{ uri: item.thumbnail }}
+                  style={styles.thumbnail || undefined}
+                />
+                <Text style={styles.suggestionListItem}>{item.name}</Text>
+              </Pressable>
+            )}
+            keyExtractor={(item) => item.id.toString()}
+            contentContainerStyle={[
+              styles.suggestionList,
+              { paddingBottom: keyboardHeight },
+            ]}
+            ListEmptyComponent={
+              notFound ? (
+                <EmptyView title="Không tìm thấy sản phẩm nào..." />
+              ) : null
+            }
+          />
         </View>
       </SafeAreaView>
     </Modal>
