@@ -42,6 +42,9 @@ const Profile: FC<Props> = (props) => {
   const onUpdateProfilePress = () => {
     navigate("UpdateProfile");
   };
+  const onSubscriptionScreenPress = () => {
+    navigate("SubscriptionScreen");
+  };
   const fetchProfile = async () => {
     setRefreshing(true);
     const res = await runAxiosAsync<{ profile: ProfileRes }>(
@@ -150,6 +153,13 @@ const Profile: FC<Props> = (props) => {
         </View>
       </View>
       <FormDivider />
+      <ProfileOptionListItem
+        style={styles.marginBottom}
+        antIconName="gift"
+        title="Hội Viên"
+        onPress={onSubscriptionScreenPress}
+       
+      />
       <ProfileOptionListItem
         style={styles.marginBottom}
         antIconName="message1"

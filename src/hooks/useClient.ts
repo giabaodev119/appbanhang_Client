@@ -23,6 +23,12 @@ export type TokenResponse = {
     isAdmin: boolean;
     isActive: boolean;
     accessToken: string;
+    premiumStatus?: {
+      subscription: String;
+      registeredAt: Date | null;
+      expiresAt: Date | null;
+      isAvailable: boolean;
+    };
   };
 };
 

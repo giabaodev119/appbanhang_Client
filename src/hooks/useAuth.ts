@@ -16,6 +16,12 @@ export interface SignInRes {
     avatar?: string;
     isAdmin: boolean;
     isActive: boolean;
+    premiumStatus?: {
+      subscription: String;
+      registeredAt: Date | null;
+      expiresAt: Date | null;
+      isAvailable: boolean;
+    };
   };
   tokens: { access: string; refresh: string };
 }
