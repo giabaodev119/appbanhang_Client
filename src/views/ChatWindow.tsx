@@ -14,7 +14,14 @@ import BackButton from "@Ui/BackBotton";
 import EmptyChatContainer from "@Ui/EmptyChatContainer";
 import PeerProfile from "@Ui/PeerProfile";
 import { FC, useCallback, useEffect, useState } from "react";
-import { View, StyleSheet, Button, Image } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Button,
+  Image,
+  Linking,
+  TouchableOpacity,
+} from "react-native";
 import {
   GiftedChat,
   IMessage,
@@ -289,13 +296,20 @@ const ChatWindow: FC<Props> = ({ route }) => {
     }, [])
   );
 
-  // Cập nhật renderMessageImage
   const renderMessageImage = (props: MessageImageProps<IMessage>) => {
+    const handlePress = () => {
+      if (props.currentMessage.image) {
+        Linking.openURL(props.currentMessage.image);
+      }
+    };
+
     return (
-      <Image
-        source={{ uri: props.currentMessage.image }}
-        style={styles.customMessageImage}
-      />
+      <TouchableOpacity onPress={handlePress}>
+        <Image
+          source={{ uri: props.currentMessage.image }}
+          style={styles.customMessageImage}
+        />
+      </TouchableOpacity>
     );
   };
 
