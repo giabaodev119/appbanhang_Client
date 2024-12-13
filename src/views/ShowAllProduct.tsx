@@ -14,6 +14,8 @@ import ShowAdminProduct from "@conponents/ShowAdminProduct";
 import colors from "@utils/color";
 import EmptyView from "./EmptyView";
 import LoadingSpinner from "@Ui/LoadingSpinner";
+import SearchModal from "@conponents/SearchModal";
+import SearchBar from "@conponents/SearchBar";
 
 export type ProductAdmin = {
   id: string;
@@ -28,6 +30,7 @@ export type ProductAdmin = {
 const ShowAllProduct = () => {
   const [listings, setListings] = useState<ProductAdmin[]>([]);
   const [loading, setLoading] = useState(false); // Trạng thái tải
+  const [showSearchModal, setShowSearchModal] = useState(false);
   const { authClient } = useClient();
   const dispatch = useDispatch();
 
@@ -106,6 +109,9 @@ const ShowAllProduct = () => {
   return (
     <>
       <View style={styles.headerContainer}>
+      <View style={styles.searchBarContainer}>
+          <SearchBar asButton onPress={() => setShowSearchModal(true)} />
+        </View>
         <Text style={styles.title}>Danh sách sản phẩm</Text>
       </View>
       {listings.length > 0 ? (
@@ -124,6 +130,7 @@ const ShowAllProduct = () => {
         </View>
       )}
       <LoadingSpinner visible={loading} />
+      <SearchModal visible={showSearchModal} onClose={setShowSearchModal} />
     </>
   );
 };
@@ -157,6 +164,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  searchBarContainer: {
+    flex: 6,
+    marginRight: 13,
+    marginLeft: 5,
   },
 });
 

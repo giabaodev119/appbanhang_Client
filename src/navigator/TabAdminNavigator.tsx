@@ -6,6 +6,7 @@ import { AntDesign } from "@expo/vector-icons";
 import AdminNavigator from "./AdminNavigator";
 import ShowAllProduct from "@views/ShowAllProduct";
 import ShowAllUser from "@views/ShowAllUser";
+import AdminDashboard from "@views/AdminDashboard";
 
 const Tab = createBottomTabNavigator();
 const getOptions = (iconName: string): BottomTabNavigationOptions => {
@@ -21,8 +22,8 @@ const TabAdminNavigator = () => {
   return (
     <Tab.Navigator screenOptions={{ headerShown: false }}>
       <Tab.Screen
-        name="AdminNavigator"
-        component={AdminNavigator}
+        name="AdminDashboard"
+        component={AdminDashboard}
         options={getOptions("home")}
       />
       <Tab.Screen
