@@ -10,6 +10,12 @@ export type Profile = {
   address?:string;
   isAdmin: boolean;
   isActive: boolean;
+  premiumStatus?: {
+    subscription: String;
+    registeredAt: Date | null;
+    expiresAt: Date | null;
+    isAvailable: boolean;
+  };
   accessToken: string;
 };
 

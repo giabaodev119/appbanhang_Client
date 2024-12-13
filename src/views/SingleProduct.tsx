@@ -96,6 +96,7 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
 
   useEffect(() => {
     if (id) fectchProductInfo(id);
+    console.log(id)
     if (product) setProductInfo(product);
   }, [id, product]);
   return (

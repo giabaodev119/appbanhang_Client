@@ -35,3 +35,6 @@ yarn-error.*
 *.tsbuildinfo
 
 src/api/client.ts
+
+#add api/client to gitignore
+src/api/client.ts

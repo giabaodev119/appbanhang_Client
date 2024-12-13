@@ -8,6 +8,7 @@ import SingleProduct from "@views/SingleProduct";
 import ChatWindow from "@views/ChatWindow";
 import EditProduct, { Product } from "@views/EditProduct";
 import UpdateProfile from "@views/UpdateProfile";
+import SubscriptionScreen from "@views/SubscriptionScreen";
 
 export type ProfileNavigatorParamList = {
   Profile: undefined;
@@ -20,6 +21,7 @@ export type ProfileNavigatorParamList = {
     conversationId: string;
     peerProfile: { id: string; name: string; avatar?: string };
   };
+  SubscriptionScreen:undefined;
 };
 const Stack = createNativeStackNavigator<ProfileNavigatorParamList>();
 
@@ -35,6 +37,7 @@ const ProfileNavigator: FC<Props> = (props) => {
       <Stack.Screen name="SingleProduct" component={SingleProduct} />
       <Stack.Screen name="ChatWindow" component={ChatWindow} />
       <Stack.Screen name="EditProduct" component={EditProduct} />
+      <Stack.Screen name="SubscriptionScreen" component={SubscriptionScreen} />
     </Stack.Navigator>
   );
 };
