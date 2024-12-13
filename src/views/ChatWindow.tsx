@@ -53,9 +53,10 @@ const getTime = (value: IMessage["createdAt"]) => {
 
 const formatConversationToIMessage = (value?: Conversation): IMessage[] => {
   const formattedValues = value?.chats.map((chat) => {
+    const isImage = chat.text.startsWith("http");
     return {
       _id: chat.id,
-      text: chat.text,
+      text: isImage ? "" : chat.text, // Loại bỏ text nếu là ảnh
       createdAt: new Date(chat.time),
       received: chat.viewed,
       user: {
@@ -63,7 +64,7 @@ const formatConversationToIMessage = (value?: Conversation): IMessage[] => {
         name: chat.user.name,
         avatar: chat.user.avatar,
       },
-      image: chat.text.startsWith("http") ? chat.text : undefined, // Check if the message is an image
+      image: isImage ? chat.text : undefined, // Xử lý ảnh
     };
   });
 
@@ -83,6 +84,7 @@ const ChatWindow: FC<Props> = ({ route }) => {
   const { authClient } = useClient();
   const [fetchingChats, setFetchingChats] = useState(false);
   const [typing, setTyping] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const profile = authState.profile;
@@ -129,7 +131,8 @@ const ChatWindow: FC<Props> = ({ route }) => {
 
   const handleOnImageSend = (imageMessage: IMessage) => {
     if (!profile) return;
-    const newImageMessage: OutGoingImageMessage = {
+
+    const newImageMessage = {
       message: {
         id: imageMessage._id.toString(),
         text: imageMessage.text,
@@ -161,42 +164,33 @@ const ChatWindow: FC<Props> = ({ route }) => {
         unreadChatCounts: 0,
       })
     );
-
     socket.emit("chat:image", newImageMessage);
   };
 
   const handleImageUpload = async () => {
-    if (!profile) return;
-    const [image] = await selectImages({
-      allowsMultipleSelection: false,
-      allowsEditing: true,
-      aspect: [1, 1],
-    });
-    if (image) {
-      setSelectedImage(image);
+    if (!profile || isUploading) return; // Tránh gọi lại khi đang tải ảnh
+    setIsUploading(true);
 
-      const imageMessage: IMessage = {
-        _id: new Date().getTime().toString(),
-        text: image, // Assuming the image URI is used as the message text
-        createdAt: new Date(),
-        user: {
-          _id: profile.id,
-          name: profile.name,
-          avatar: profile.avatar,
-        },
-        image, // Add the image URI to the message
-      };
+    try {
+      const [image] = await selectImages({
+        allowsMultipleSelection: false,
+        allowsEditing: true,
+        aspect: [1, 1],
+      });
+
+      if (!image) return;
+
+      setSelectedImage(image);
 
       const formData = new FormData();
       formData.append("image", {
         name: "Image",
         uri: image,
-        type: mime.getType(image),
+        type: mime.getType(image) || "image/jpeg",
       } as any);
 
-      const response = await runAxiosAsync<{
-        image: { url: string; id: string };
-      }>(
+      // Chỉ gửi qua API
+      const response = await runAxiosAsync(
         authClient.post(
           `/conversation/${conversationId}/upload-image`,
           formData,
@@ -210,13 +204,23 @@ const ChatWindow: FC<Props> = ({ route }) => {
 
       if (response?.image?.url) {
         const updatedImageMessage = {
-          ...imageMessage,
-          text: response.image.url, // Update the message text with the image URL
-          image: response.image.url, // Update the image property with the image URL
+          _id: new Date().getTime().toString(),
+          text: response.image.url,
+          image: response.image.url,
+          createdAt: new Date(),
+          user: {
+            _id: profile.id,
+            name: profile.name,
+            avatar: profile.avatar,
+          },
         };
 
-        handleOnImageSend(updatedImageMessage);
+        handleOnImageSend(updatedImageMessage); // Chỉ emit socket sau khi API trả về URL Cloudinary
       }
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -285,6 +289,7 @@ const ChatWindow: FC<Props> = ({ route }) => {
     }, [])
   );
 
+  // Cập nhật renderMessageImage
   const renderMessageImage = (props: MessageImageProps<IMessage>) => {
     return (
       <Image
