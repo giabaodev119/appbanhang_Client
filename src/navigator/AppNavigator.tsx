@@ -8,6 +8,7 @@ import SingleProduct from "@views/SingleProduct";
 import ChatWindow from "@views/ChatWindow";
 import SearchAddress from "@views/SearchAddress";
 import { Product } from "@views/EditProduct";
+import SellerDetail from "@conponents/SellerDetail";
 
 export type AppStackParamList = {
   Home: undefined;
@@ -19,6 +20,7 @@ export type AppStackParamList = {
     peerProfile: { id: string; name: string; avatar?: string };
   };
   SearchAddress: undefined;
+  SellerDetail: { id: string };
 };
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -34,6 +36,7 @@ const AppNavigator: FC<Props> = (props) => {
       <Stack.Screen name="SingleProduct" component={SingleProduct} />
       <Stack.Screen name="ChatWindow" component={ChatWindow} />
       <Stack.Screen name="SearchAddress" component={SearchAddress} />
+      <Stack.Screen name="SellerDetail" component={SellerDetail} />
     </Stack.Navigator>
   );
 };
