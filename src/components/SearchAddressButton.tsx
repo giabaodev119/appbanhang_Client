@@ -1,12 +1,5 @@
 import { FC } from "react";
-import {
-  Text,
-  View,
-  StyleSheet,
-  Pressable,
-  StyleProp,
-  ViewStyle,
-} from "react-native";
+import { StyleSheet, Pressable, StyleProp, ViewStyle } from "react-native";
 import { Entypo } from "@expo/vector-icons";
 import colors from "@utils/color";
 

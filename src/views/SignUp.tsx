@@ -28,6 +28,7 @@ const SignUp: FC<Props> = (props) => {
     name: "",
     email: "",
     password: "",
+    phoneNumber: "",
     provinceName: "",
     districtName: "",
   });
@@ -41,7 +42,6 @@ const SignUp: FC<Props> = (props) => {
     setUserInfo({ ...userInfo, [name]: text });
   const handleSubmit = async () => {
     const { values, error } = await yupValidate(newUserSchema, userInfo);
-    
 
     if (error) return showMessage({ message: error, type: "danger" });
 
@@ -56,7 +56,8 @@ const SignUp: FC<Props> = (props) => {
     setBusy(false);
   };
 
-  const { email, name, password, provinceName, districtName } = userInfo;
+  const { email, name, password, provinceName, districtName, phoneNumber } =
+    userInfo;
   return (
     <CustomKeyAvoidingView>
       <View style={styles.innerContainer}>
@@ -79,6 +80,12 @@ const SignUp: FC<Props> = (props) => {
             secureTextEntry
             value={password}
             onChangeText={handleChange("password")}
+          />
+          <FormInput
+            placeholder="Phone number"
+            value={phoneNumber}
+            onChangeText={handleChange("phoneNumber")}
+            keyboardType="numeric"
           />
           <ProvinceOptions
             onSelect={(province: tinh) => {
