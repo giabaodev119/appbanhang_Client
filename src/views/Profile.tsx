@@ -152,6 +152,7 @@ const Profile: FC<Props> = (props) => {
           uri={authState.profile?.avatar}
           size={80}
           onPress={handleProfileImageSelection}
+          isVip={authState.profile?.premiumStatus?.isAvailable} // Kiểm tra thuộc tính VIP
         />
         <View style={styles.profileInfo}>
           <View style={styles.nameContainer}>
@@ -169,7 +170,6 @@ const Profile: FC<Props> = (props) => {
         antIconName="gift"
         title="Hội Viên"
         onPress={onSubscriptionScreenPress}
-       
       />
       <ProfileOptionListItem
         style={styles.marginBottom}
