@@ -24,6 +24,12 @@ export type AdminUser = {
   isActive: boolean;
   isAdmin: boolean;
   createdAt: string;
+  premiumStatus?: {
+    subscription: String;
+    registeredAt: Date | null;
+    expiresAt: Date | null;
+    isAvailable: boolean;
+  };
 };
 
 const ShowAllUser = () => {

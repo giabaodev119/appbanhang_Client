@@ -38,6 +38,7 @@ type SearchResult = {
   name: string;
   thumbnail?: string;
   isActive: boolean;
+  isSold: boolean;
 };
 
 const SearchModal: FC<Props> = ({ visible, onClose, onPress }) => {
@@ -64,7 +65,9 @@ const SearchModal: FC<Props> = ({ visible, onClose, onPress }) => {
       );
       if (res?.results) {
         // Lọc sản phẩm có isActive là false
-        return res.results.filter((product) => product.isActive);
+        return res.results.filter(
+          (product) => product.isActive && !product.isSold
+        );
       }
     }
     return [];
