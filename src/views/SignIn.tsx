@@ -10,11 +10,6 @@ import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { AuthStackParamList } from "@navigator/AuthNavigator";
 import { signInSchema, yupValidate } from "@utils/validator";
 import { showMessage } from "react-native-flash-message";
-import { runAxiosAsync } from "@api/runAxiosAsync";
-import client from "@api/client";
-import { useDispatch } from "react-redux";
-import { updateAuthState } from "@store/auth";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import useAuth from "src/hooks/useAuth";
 
 interface Props {}

@@ -154,7 +154,9 @@ const Home: FC<Props> = () => {
           <View style={styles.sectionContainer}>
             <ShowProduct
               title="Sản phẩm gần bạn"
-              data={productsByAddress.slice(0, 4)}
+              data={productsByAddress
+                .filter((product) => product.isActive)
+                .slice(0, 4)}
               onPress={({ id }) => navigate("SingleProduct", { id })}
             />
           </View>
@@ -163,7 +165,7 @@ const Home: FC<Props> = () => {
         {/* Latest Products */}
         <View style={styles.sectionContainer}>
           <LatesProductList
-            data={products}
+            data={products.filter((product) => product.isActive)}
             onPress={({ id }) => navigate("SingleProduct", { id })}
           />
         </View>

@@ -17,6 +17,7 @@ export const yupValidate = async <T extends object>(
     }
   }
 };
+const phoneNumberRegex = /^[0-9]{10}$/;
 
 export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const passwordRegex =
@@ -44,6 +45,10 @@ const EmailAndPassValidation = {
 
 export const newUserSchema = yup.object({
   name: yup.string().required("Tên không được để trống!"),
+  phoneNumber: yup
+    .string()
+    .matches(phoneNumberRegex, "Số điện thoại phải là số và có 10 ký tự!")
+    .required("Số điện thoại không được để trống!"),
   ...EmailAndPassValidation,
 });
 export const signInSchema = yup.object({
@@ -64,6 +69,8 @@ export const newProductSchema = yup.object({
 });
 export const profileSchema = yup.object({
   name: yup.string().required("Tên không được để trống!"),
-  provinceName: yup.string().required("Tên tỉnh/thành phố không được để trống!"), // New validation rule for provinceName
+  provinceName: yup
+    .string()
+    .required("Tên tỉnh/thành phố không được để trống!"), // New validation rule for provinceName
   districtName: yup.string().required("Tên quận/huyện không được để trống!"), // New validation rule for districtName
 });
