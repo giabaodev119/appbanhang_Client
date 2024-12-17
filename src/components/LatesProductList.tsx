@@ -11,6 +11,7 @@ export type LatestProduct = {
   price: number;
   address?: string;
   isActive: boolean;
+  isSold:boolean;
 };
 
 interface Props {

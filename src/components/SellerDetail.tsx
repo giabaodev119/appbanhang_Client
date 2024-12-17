@@ -92,8 +92,20 @@ const SellerDetail: FC = () => {
           )}
         </View>
         <ScrollView contentContainerStyle={styles.container}>
-          <View style={styles.sectionContainer}>
-            <ShowProduct data={products} title="Sản phẩm của người bán" />
+          <View style={styles.rowContainer}>
+            <View style={styles.productSection}>
+              <ShowProduct data={products} title="Sản phẩm của người bán" />
+            </View>
+            <View style={styles.soldProductSection}>
+              <Text style={styles.productTitle}>Sản phẩm đã bán:</Text>
+              <View style={styles.productList}>
+                {products.map((product, index) => (
+                  <Text key={index} style={styles.productName}>
+                    {product.name}
+                  </Text>
+                ))}
+              </View>
+            </View>
           </View>
         </ScrollView>
       </View>
@@ -150,6 +162,32 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontStyle: "italic",
     textAlign: "left",
+  },
+  rowContainer: {
+    flexDirection: "row", // Đặt các phần tử theo hàng ngang
+    justifyContent: "space-between",
+    paddingHorizontal: size.padding,
+  },
+  productSection: {
+    width: "48%", // Chia màn hình thành 2 cột, mỗi cột 48% chiều rộng
+  },
+  soldProductSection: {
+    width: "48%", // Chia màn hình thành 2 cột, mỗi cột 48% chiều rộng
+  },
+  productTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#000000",
+    marginTop: 15,
+    marginBottom: 5,
+  },
+  productList: {
+    marginTop: 10,
+  },
+  productName: {
+    fontSize: 16,
+    color: "#333333",
+    marginTop: 5,
   },
   container: {
     padding: size.padding,

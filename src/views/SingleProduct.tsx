@@ -7,8 +7,8 @@ import BackButton from "@Ui/BackBotton";
 import OptionButton from "@Ui/OptionButton";
 import React, { useEffect, useState } from "react";
 import { FC } from "react";
-import { View, StyleSheet, Text, Alert, Pressable } from "react-native";
-import { Feather, AntDesign } from "@expo/vector-icons";
+import { View, StyleSheet, Text, Alert, TouchableOpacity } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import colors from "@utils/color";
 import useClient from "@hooks/useClient";
 import { runAxiosAsync } from "@api/runAxiosAsync";
@@ -32,6 +32,7 @@ const menuOption = [
     icon: <Feather name="trash-2" size={20} color={colors.primary} />,
   },
 ];
+
 const SingleProduct: FC<Props> = ({ route, navigation }) => {
   const { authState } = useAuth();
   const { authClient } = useClient();
@@ -94,11 +95,35 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
     }
   };
 
+  const handleMarkAsSold = async () => {
+    if (!productInfo || productInfo.isSold) return; // Không làm gì nếu sản phẩm đã bán
+
+    setBusy(true);
+
+    try {
+      const res = await runAxiosAsync<{ message: string }>(
+        authClient.patch(`/product/${productInfo.id}/sold`, { isSold: true })
+      );
+
+      if (res) {
+        showMessage({ message: res.message, type: "success" });
+        setProductInfo({ ...productInfo, isSold: true }); // Cập nhật trạng thái sản phẩm
+      }
+    } catch (error) {
+      showMessage({
+        message: "Không thể đánh dấu sản phẩm. Vui lòng thử lại.",
+        type: "danger",
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
+
   useEffect(() => {
     if (id) fectchProductInfo(id);
-    console.log(id)
     if (product) setProductInfo(product);
   }, [id, product]);
+
   return (
     <>
       <AppHeader
@@ -113,13 +138,24 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
         {!isAdmin && (
           <ChatIcon onPress={onChatBtnPress} busy={fetchingChatID} />
         )}
+
+        {/* Nút đánh dấu đã bán, chỉ hiển thị cho người bán */}
+        {isAdmin && !productInfo?.isSold &&(
+          <TouchableOpacity
+            style={styles.soldButton}
+            onPress={handleMarkAsSold}
+          >
+            <Text style={styles.soldButtonText}>Đánh dấu đã bán</Text>
+          </TouchableOpacity>
+        )}
       </View>
+
       <OptionModal
         options={menuOption}
         renderItem={({ icon, name }) => (
           <View style={styles.option}>
             {icon}
-            <Text style={styles.optionTitle}> {name}</Text>
+            <Text style={styles.optionTitle}>{name}</Text>
           </View>
         )}
         visible={showMenu}
@@ -151,6 +187,18 @@ const styles = StyleSheet.create({
   optionTitle: {
     paddingLeft: 5,
     color: colors.primary,
+  },
+  soldButton: {
+    marginTop: 20,
+    alignSelf: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: colors.textMessage,
+    borderRadius: 5,
+  },
+  soldButtonText: {
+    color: colors.white,
+    fontWeight: "bold",
   },
 });
 
