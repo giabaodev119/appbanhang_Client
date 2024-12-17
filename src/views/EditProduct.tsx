@@ -40,6 +40,7 @@ export type Product = {
   districtName?: string;
   address?: string;
   isActive: boolean;
+  isSold:boolean;
   seller: {
     id: string;
     name: string;

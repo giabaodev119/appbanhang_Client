@@ -51,37 +51,26 @@ const Home: FC<Props> = () => {
       authClient.get("/product/latest")
     );
     if (res?.products) {
-      setProducts(res.products);
+      const availableProducts = res.products.filter((p) => !p.isSold); // Lọc sản phẩm chưa bán
+      setProducts(availableProducts);
     }
   };
-
+  
   const fetchProductByAddress = async () => {
     const res = await runAxiosAsync<{ results: LatestProduct[] }>(
       authClient.get("/product/get-byaddress")
     );
     if (res?.results) {
-      setProductsByAddress(res.results);
-      console.log(res.results);
-    } else {
-      return null;
+      const availableProducts = res.results.filter((p) => !p.isSold); // Lọc sản phẩm chưa bán
+      setProductsByAddress(availableProducts);
     }
   };
-
-  const fetchLastChats = async () => {
-    const res = await runAxiosAsync<{ chats: ActiveChat[] }>(
-      authClient("/conversation/last-chats")
-    );
-
-    if (res) {
-      dispatch(addNewActiveChats(res.chats));
-    }
-  };
+  
 
   const handleRefresh = async () => {
     setRefreshing(true);
     await fetchProductByAddress();
     await fetchLatestProduct();
-    await fetchLastChats();
     setRefreshing(false);
   };
 
@@ -98,7 +87,11 @@ const Home: FC<Props> = () => {
       socket.disconnect();
     };
   }, []);
-
+  useEffect(() => {
+    console.log("Products from API:", products);
+    console.log("Filtered products (not sold):", products.filter((p) => !p.isSold));
+  }, [products]);
+  
   return (
     <>
       {/* Header */}
@@ -155,7 +148,7 @@ const Home: FC<Props> = () => {
             <ShowProduct
               title="Sản phẩm gần bạn"
               data={productsByAddress
-                .filter((product) => product.isActive)
+                .filter((product) => product.isActive).filter((p) => !p.isSold)
                 .slice(0, 4)}
               onPress={({ id }) => navigate("SingleProduct", { id })}
             />
@@ -165,7 +158,7 @@ const Home: FC<Props> = () => {
         {/* Latest Products */}
         <View style={styles.sectionContainer}>
           <LatesProductList
-            data={products.filter((product) => product.isActive)}
+            data={products.filter((product) => product.isActive).filter((p) => !p.isSold)}
             onPress={({ id }) => navigate("SingleProduct", { id })}
           />
         </View>
@@ -176,7 +169,6 @@ const Home: FC<Props> = () => {
     </>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: size.padding,
