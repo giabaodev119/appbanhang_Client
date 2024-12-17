@@ -4,7 +4,13 @@ import ProvinceOptions from "@conponents/ProvinceOptions";
 import BackButton from "@Ui/BackBotton";
 import size from "@utils/size";
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "react-native-svg";
 import colors from "@utils/color";
@@ -41,7 +47,6 @@ const SearchAddress: React.FC = () => {
   });
 
   const handleSubmit = async () => {
-    // Lấy dữ liệu từ state
     const data = {
       provinceName: productInfo.provinceName,
       districtName: productInfo.districtName,
@@ -49,32 +54,29 @@ const SearchAddress: React.FC = () => {
 
     if (!data.provinceName) {
       showMessage({ message: "Vui lòng chọn tỉnh", type: "warning" });
+      return;
     }
-    // Kiểm tra dữ liệu trước khi gửi
+
+    let res;
     if (data.provinceName && data.districtName) {
-      const res = await runAxiosAsync<{ results: LatestProduct[] }>(
+      res = await runAxiosAsync<{ results: LatestProduct[] }>(
         authClient.get(
           `/product/search-byaddress/?ProvinceName=${data.provinceName}&DistrictName=${data.districtName}`
         )
       );
-
-      if (res?.results) {
-        setSearchResults(res.results);
-      } else {
-        setSearchResults([]);
-      }
     } else {
-      const res = await runAxiosAsync<{ results: LatestProduct[] }>(
+      res = await runAxiosAsync<{ results: LatestProduct[] }>(
         authClient.get(
           `/product/search-byaddress/?ProvinceName=${data.provinceName}`
         )
       );
+    }
 
-      if (res?.results) {
-        setSearchResults(res.results);
-      } else {
-        setSearchResults([]);
-      }
+    if (res?.results) {
+      const filteredResults = res.results.filter((product) => product.isActive);
+      setSearchResults(filteredResults);
+    } else {
+      setSearchResults([]);
     }
   };
 

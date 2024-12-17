@@ -146,22 +146,22 @@ const Home: FC<Props> = () => {
         {productsByAddress && productsByAddress.length > 0 && (
           <View style={styles.sectionContainer}>
             <ShowProduct
-             title="Sản phẩm gần bạn"
-             data={productsByAddress.filter((p) => !p.isSold)} // Lọc thêm một lần nữa nếu cần
-             onPress={({ id }) => navigate("SingleProduct", { id })}
+              title="Sản phẩm gần bạn"
+              data={productsByAddress
+                .filter((product) => product.isActive).filter((p) => !p.isSold)
+                .slice(0, 4)}
+              onPress={({ id }) => navigate("SingleProduct", { id })}
             />
           </View>
         )}
 
         {/* Latest Products */}
-        {products && products.length > 0 && (
-          <View style={styles.sectionContainer}>
-            <LatesProductList
-               data={products.filter((p) => !p.isSold)} // Lọc thêm một lần nữa nếu cần
-               onPress={({ id }) => navigate("SingleProduct", { id })}
-            />
-          </View>
-        )}
+        <View style={styles.sectionContainer}>
+          <LatesProductList
+            data={products.filter((product) => product.isActive).filter((p) => !p.isSold)}
+            onPress={({ id }) => navigate("SingleProduct", { id })}
+          />
+        </View>
       </ScrollView>
 
       {/* Search Modal */}

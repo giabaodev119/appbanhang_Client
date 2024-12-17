@@ -25,6 +25,7 @@ import useClient from "@hooks/useClient";
 import { debounce } from "@utils/helper";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { AppStackParamList } from "@navigator/AppNavigator";
+import { is } from "ramda";
 
 interface Props {
   visible: boolean;
@@ -36,6 +37,7 @@ type SearchResult = {
   id: string;
   name: string;
   thumbnail?: string;
+  isActive: boolean;
 };
 
 const SearchModal: FC<Props> = ({ visible, onClose, onPress }) => {
@@ -57,13 +59,16 @@ const SearchModal: FC<Props> = ({ visible, onClose, onPress }) => {
 
   const searchProduct = async (query: string) => {
     if (query.trim().length >= 3) {
-      return await runAxiosAsync<{ results: [] }>(
+      const res = await runAxiosAsync<{ results: SearchResult[] }>(
         authClient.get("/product/search?name=" + query)
       );
+      if (res?.results) {
+        // Lọc sản phẩm có isActive là false
+        return res.results.filter((product) => product.isActive);
+      }
     }
+    return [];
   };
-
-  const searchDebounce = debounce(searchProduct, 300);
 
   const handleChange = async (value: string) => {
     setQuery(value); // Cập nhật giá trị ô tìm kiếm
@@ -77,17 +82,22 @@ const SearchModal: FC<Props> = ({ visible, onClose, onPress }) => {
       return;
     }
 
+    const searchDebounce = debounce(searchProduct, 300);
+
     // Xử lý khi có nội dung trong ô tìm kiếm
     if (value.trim().length >= 3) {
       setBusy(true);
-      const res = await searchDebounce(value);
+      const filteredResults = await searchDebounce(value); // Gọi hàm tìm kiếm đã được debounce
       setBusy(false);
-      if (res) {
-        if (res.results.length) setResults(res.results);
-        else setNotFound(true);
+
+      if (filteredResults.length > 0) {
+        setResults(filteredResults); // Cập nhật kết quả đã lọc
+      } else {
+        setNotFound(true); // Không tìm thấy sản phẩm nào
       }
     }
   };
+
   useEffect(() => {
     const keyShowEvent =
       Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
