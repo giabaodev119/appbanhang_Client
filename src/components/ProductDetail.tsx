@@ -58,6 +58,7 @@ const ProductDetail: FC<Props> = ({ product }) => {
         <AvatarView uri={product.seller.avatar} size={60} />
         <View style={styles.profileTextContainer}>
           <Text style={styles.profileName}>{product.seller.name}</Text>
+          <Text style={styles.profileLabel}>Hotline:{product.seller.phoneNumber}</Text>
           <Text style={styles.profileLabel}>Người bán</Text>
         </View>
       </Pressable>
@@ -144,7 +145,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   profileLabel: {
-    color: colors.deActive,
+    color: colors.primary,
     fontSize: 14,
   },
 });

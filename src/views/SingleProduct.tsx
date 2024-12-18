@@ -19,6 +19,8 @@ import { deleteItem } from "@store/listings";
 import ChatIcon from "@conponents/ChatIcon";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Product } from "./EditProduct";
+import { addSavedProduct } from "@store/savedProductsSlice";
+import { Linking } from "react-native";
 
 type Props = NativeStackScreenProps<ProfileNavigatorParamList, "SingleProduct">;
 
@@ -42,6 +44,7 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const { product, id } = route.params;
   const [showMenu, setShowMenu] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   const isAdmin = authState.profile?.id === productInfo?.seller.id;
 
@@ -123,7 +126,29 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
     if (id) fectchProductInfo(id);
     if (product) setProductInfo(product);
   }, [id, product]);
+  const handleSaveProduct = () => {
+    if (!productInfo) return;
 
+    setSaved(true);
+    dispatch(addSavedProduct(productInfo)); // Lưu sản phẩm vào Redux store
+    showMessage({ message: "Sản phẩm đã được lưu.", type: "success" });
+  };
+
+  const onCallSeller = () => {
+    if (productInfo?.seller.phoneNumber) {
+      Linking.openURL(`tel:${productInfo.seller.phoneNumber}`).catch(() => {
+        showMessage({
+          message: "Không thể thực hiện cuộc gọi.",
+          type: "danger",
+        });
+      });
+    } else {
+      showMessage({
+        message: "Số điện thoại không khả dụng.",
+        type: "warning",
+      });
+    }
+  };
   return (
     <>
       <AppHeader
@@ -134,11 +159,40 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
       />
       <View style={styles.container}>
         {productInfo ? <ProductDetail product={productInfo} /> : <></>}
+          
+        {productInfo?.isSold && (
+        <View style={styles.soldNotification}>
+          <Text style={styles.soldNotificationText}>Sản phẩm đã bán</Text>
+        </View>
+      )}
 
+{!isAdmin && productInfo?.seller.phoneNumber && (
+      <TouchableOpacity style={styles.callButton} onPress={onCallSeller}>
+        <Feather name="phone" size={20} color={colors.white} />
+        <Text style={styles.callButtonText}>Gọi người bán</Text>
+      </TouchableOpacity>
+    )}
         {!isAdmin && (
           <ChatIcon onPress={onChatBtnPress} busy={fetchingChatID} />
         )}
+         {/* Nút gọi điện chỉ hiển thị cho người mua */}
 
+            {/* Nút lưu sản phẩm, chỉ hiển thị cho người mua */}
+      {!isAdmin && (
+        <TouchableOpacity
+          style={[
+            styles.saveButton,
+            saved && { backgroundColor: colors.active }, // Đổi màu nếu đã lưu
+          ]}
+          onPress={handleSaveProduct}
+          disabled={saved} // Vô hiệu hóa nếu đã lưu
+        >
+          <Feather name={saved ? "check-circle" : "bookmark"} size={20} color={colors.white} />
+          <Text style={styles.saveButtonText}>
+            {saved ? "Đã lưu" : "Lưu sản phẩm"}
+          </Text>
+        </TouchableOpacity>
+      )}
         {/* Nút đánh dấu đã bán, chỉ hiển thị cho người bán */}
         {isAdmin && !productInfo?.isSold &&(
           <TouchableOpacity
@@ -152,7 +206,7 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
 
       <OptionModal
         options={menuOption}
-        renderItem={({ icon, name }) => (
+        renderItem={({ icon, name, }) => (
           <View style={styles.option}>
             {icon}
             <Text style={styles.optionTitle}>{name}</Text>
@@ -199,6 +253,48 @@ const styles = StyleSheet.create({
   soldButtonText: {
     color: colors.white,
     fontWeight: "bold",
+  },
+  soldNotification: {
+    marginTop: 20,
+    alignSelf: "center",
+    backgroundColor: colors.deActive, // Màu nổi bật để báo sản phẩm đã bán
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  soldNotificationText: {
+    color: colors.white,
+    fontWeight: "bold",
+  },
+  saveButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "center",
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: colors.primary,
+    borderRadius: 5,
+  },
+  saveButtonText: {
+    color: colors.white,
+    fontWeight: "bold",
+    marginLeft: 10,
+  },
+  callButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "center",
+    marginTop: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: colors.primary,
+    borderRadius: 5,
+  },
+  callButtonText: {
+    color: colors.white,
+    fontWeight: "bold",
+    marginLeft: 10,
   },
 });
 

@@ -56,6 +56,9 @@ const Profile: FC<Props> = (props) => {
   const onSubscriptionScreenPress = () => {
     navigate("SubscriptionScreen");
   };
+  const onSavedProductsScreen=()=>{
+    navigate("SavedProductsScreen")
+  }
   const fetchProfile = async () => {
     setRefreshing(true);
     const res = await runAxiosAsync<{ profile: ProfileRes }>(
@@ -183,6 +186,12 @@ const Profile: FC<Props> = (props) => {
         antIconName="appstore-o"
         title="Sản phẩm của bạn"
         onPress={onListingPress}
+      />
+      <ProfileOptionListItem
+        style={styles.marginBottom}
+        antIconName="appstore-o"
+        title="Sản phẩm đã lưu"
+        onPress={onSavedProductsScreen}
       />
       <ProfileOptionListItem
         antIconName="logout"

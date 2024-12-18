@@ -40,6 +40,7 @@ const SellerDetail: FC = () => {
         products: Product[];
       }>(authClient.get(`/product/get-byseller?id=${id}`));
       if (res) {
+        
         setSeller(res.owner);
         setProducts(res.products);
       } else {
@@ -70,6 +71,10 @@ const SellerDetail: FC = () => {
     );
   }
 
+  // Lọc sản phẩm theo trạng thái isSold
+  const availableProducts = products.filter((product) => product.isSold === false); // Sản phẩm chưa bán
+  const soldProducts = products.filter((product) => product.isSold === true); // Sản phẩm đã bán
+  
   return (
     <>
       <AppHeader backButton={<BackButton />} />
@@ -93,13 +98,16 @@ const SellerDetail: FC = () => {
         </View>
         <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.rowContainer}>
+            {/* Sản phẩm chưa bán */}
             <View style={styles.productSection}>
-              <ShowProduct data={products} title="Sản phẩm của người bán" />
+              <ShowProduct data={availableProducts} title="Sản phẩm của người bán" />
             </View>
+
+            {/* Sản phẩm đã bán */}
             <View style={styles.soldProductSection}>
               <Text style={styles.productTitle}>Sản phẩm đã bán:</Text>
               <View style={styles.productList}>
-                {products.map((product, index) => (
+                {soldProducts.map((product, index) => (
                   <Text key={index} style={styles.productName}>
                     {product.name}
                   </Text>
@@ -116,10 +124,10 @@ const SellerDetail: FC = () => {
 const styles = StyleSheet.create({
   fullBackground: {
     flex: 1,
-    backgroundColor: "#f4f4f4", // Nền toàn màn hình
+    backgroundColor: "#f4f4f4",
   },
   sellerHeader: {
-    backgroundColor: "#4a90e2", // Màu nền mới (xanh nhạt)
+    backgroundColor: "#4a90e2",
     paddingBottom: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
@@ -128,10 +136,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f4f4f4", // Nền khi đang tải
+    backgroundColor: "#f4f4f4",
   },
   profileContainer: {
-    alignItems: "flex-start", // Căn lề trái toàn bộ
+    alignItems: "flex-start",
     padding: 20,
   },
   profileInfo: {
@@ -141,12 +149,12 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#ffffff", // Màu chữ trắng
+    color: "#ffffff",
     textAlign: "left",
   },
   email: {
     fontSize: 16,
-    color: "#e1e1e1", // Màu chữ xám nhạt
+    color: "#e1e1e1",
     marginTop: 5,
     textAlign: "left",
   },
@@ -164,15 +172,16 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   rowContainer: {
-    flexDirection: "row", // Đặt các phần tử theo hàng ngang
+    flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: size.padding,
   },
   productSection: {
-    width: "48%", // Chia màn hình thành 2 cột, mỗi cột 48% chiều rộng
+    flexDirection: "column",
+    width: "100%",
   },
   soldProductSection: {
-    width: "48%", // Chia màn hình thành 2 cột, mỗi cột 48% chiều rộng
+    width: "60%",
   },
   productTitle: {
     fontSize: 18,
@@ -191,18 +200,6 @@ const styles = StyleSheet.create({
   },
   container: {
     padding: size.padding,
-  },
-  sectionContainer: {
-    marginBottom: 25,
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-    backgroundColor: "#ffffff", // Nền trắng cho phần nội dung
-    borderRadius: 10,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
   },
 });
 

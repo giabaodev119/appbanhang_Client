@@ -152,7 +152,7 @@ const SubscriptionScreen: FC<Props> = ({navigation}) => {
       <View style={styles.container}>
         <Text style={styles.header}>Hãy lựa chọn gói hội viên cho bạn</Text>
         <Text style={styles.subHeader}>
-          Được ưu tiên đề xuất trên trang chính{"\n"}Thời gian đăng bán lâu hơn gấp 3 lần
+          Được ưu tiên đề xuất trên trang chính{"\n"}Thời gian đăng bán lâu hơn gấp 3 lần{"\n"}Không giới hạn bài đăng
         </Text>
 
         {/* Plans */}
