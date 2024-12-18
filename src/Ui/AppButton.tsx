@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   btnActive: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.lightred,
   },
   btnDeActive: {
     backgroundColor: colors.deActive,

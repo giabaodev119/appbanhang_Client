@@ -8,7 +8,7 @@ interface Props {}
 const BackButton: FC<Props> = (props) => {
   return (
     <View style={styles.container}>
-      <Ionicons name="chevron-back" size={18} color={colors.active} />
+      <Ionicons name="chevron-back" size={18} color={colors.lightred} />
       <Text style={styles.title}>Quay lại</Text>
     </View>
   );
@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    color: colors.active,
+    color: colors.lightred,
   },
 });
 

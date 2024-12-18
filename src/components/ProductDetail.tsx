@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   price: {
-    color: colors.active,
+    color: colors.lightred,
     fontWeight: "700",
     fontSize: 28,
     marginTop: 10,
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     textAlign: "left", // Căn lề trái
   },
   category: {
-    color: colors.deActive,
+    color: colors.primary,
     fontSize: 14,
     marginTop: 5,
     textAlign: "left", // Căn lề trái

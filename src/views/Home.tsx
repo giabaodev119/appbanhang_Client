@@ -55,7 +55,7 @@ const Home: FC<Props> = () => {
       setProducts(availableProducts);
     }
   };
-  
+
   const fetchProductByAddress = async () => {
     const res = await runAxiosAsync<{ results: LatestProduct[] }>(
       authClient.get("/product/get-byaddress")
@@ -65,7 +65,6 @@ const Home: FC<Props> = () => {
       setProductsByAddress(availableProducts);
     }
   };
-  
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -87,11 +86,8 @@ const Home: FC<Props> = () => {
       socket.disconnect();
     };
   }, []);
-  useEffect(() => {
-    console.log("Products from API:", products);
-    console.log("Filtered products (not sold):", products.filter((p) => !p.isSold));
-  }, [products]);
-  
+  useEffect(() => {}, [products]);
+
   return (
     <>
       {/* Header */}
@@ -148,7 +144,8 @@ const Home: FC<Props> = () => {
             <ShowProduct
               title="Sản phẩm gần bạn"
               data={productsByAddress
-                .filter((product) => product.isActive).filter((p) => !p.isSold)
+                .filter((product) => product.isActive)
+                .filter((p) => !p.isSold)
                 .slice(0, 4)}
               onPress={({ id }) => navigate("SingleProduct", { id })}
             />
@@ -158,7 +155,9 @@ const Home: FC<Props> = () => {
         {/* Latest Products */}
         <View style={styles.sectionContainer}>
           <LatesProductList
-            data={products.filter((product) => product.isActive).filter((p) => !p.isSold)}
+            data={products
+              .filter((product) => product.isActive)
+              .filter((p) => !p.isSold)}
             onPress={({ id }) => navigate("SingleProduct", { id })}
           />
         </View>
@@ -181,11 +180,19 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     marginBottom: 10,
     paddingHorizontal: 10,
+    backgroundColor: colors.white, // Header nổi bật với màu chính
   },
   searchBarContainer: {
     flex: 6,
     marginRight: 10,
     marginLeft: 10,
+    backgroundColor: colors.white, // Nền trắng cho sự đơn giản
+    borderRadius: 10,
+    shadowColor: colors.backDropDark,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 4,
   },
   searchAddressButtonContainer: {
     flex: 1,
@@ -194,29 +201,36 @@ const styles = StyleSheet.create({
     height: 160,
     marginBottom: 20,
     borderRadius: 10,
-    overflow: "hidden", // Ẩn viền của ảnh bo tròn
+    overflow: "hidden",
     shadowColor: colors.backDropDark,
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 4,
+    shadowOpacity: 0.2, // Tăng độ rõ của bóng
+    shadowRadius: 6,
+    elevation: 5,
   },
   bannerImage: {
     width: "100%",
     height: "100%",
     resizeMode: "cover",
+    borderRadius: 10,
   },
   sectionContainer: {
     marginBottom: 25,
     paddingVertical: 10,
-    paddingHorizontal: 5,
+    paddingHorizontal: 10,
     backgroundColor: colors.white,
     borderRadius: 10,
     shadowColor: colors.backDropDark,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
+    shadowRadius: 4,
     elevation: 3,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: colors.primary,
+    marginBottom: 10,
   },
 });
 export default Home;
