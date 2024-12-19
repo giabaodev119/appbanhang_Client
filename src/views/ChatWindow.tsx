@@ -321,7 +321,7 @@ const ChatWindow: FC<Props> = ({ navigation, route }) => {
     };
 
     return (
-      <TouchableOpacity onPress={handlePress}>
+      <TouchableOpacity onLongPress={handlePress}>
         <Image
           source={{ uri: props.currentMessage.image }}
           style={styles.customMessageImage}

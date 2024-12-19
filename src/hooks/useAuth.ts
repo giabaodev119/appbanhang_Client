@@ -16,6 +16,7 @@ export interface SignInRes {
     avatar?: string;
     isAdmin: boolean;
     isActive: boolean;
+    phoneNumber: string;
     premiumStatus?: {
       subscription: String;
       registeredAt: Date | null;

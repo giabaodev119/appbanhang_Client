@@ -11,6 +11,8 @@ import { AntDesign } from "@expo/vector-icons";
 import AppNavigator from "./AppNavigator";
 import NewListing from "@views/NewListing";
 import ProfileNavigator from "./ProfileNavigator";
+import { showMessage } from "react-native-flash-message";
+import useAuth from "@hooks/useAuth";
 import colors from "@utils/color";
 
 const Tab = createBottomTabNavigator();
@@ -37,6 +39,9 @@ const CustomTabButton: React.FC<CustomTabButtonProps> = ({
 );
 
 const TabNavigator = () => {
+  const { authState } = useAuth(); // Lấy thông tin xác thực người dùng
+  const isVerified = authState.profile?.verified;
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -63,7 +68,7 @@ const TabNavigator = () => {
               Trang chủ
             </Text>
           ),
-          tabBarIcon: ({ color, size, focused }) => (
+          tabBarIcon: ({ size, focused }) => (
             <AntDesign
               name="home"
               size={size}
@@ -77,8 +82,19 @@ const TabNavigator = () => {
       <Tab.Screen
         name="NewListing"
         component={NewListing}
+        listeners={{
+          tabPress: (e) => {
+            if (!isVerified) {
+              e.preventDefault(); // Ngăn chặn điều hướng
+              showMessage({
+                message: "Bạn phải xác thực tài khoản trước khi đăng sản phẩm!",
+                type: "warning",
+              });
+            }
+          },
+        }}
         options={{
-          tabBarLabel: ({ focused }) => (
+          tabBarLabel: () => (
             <Text
               style={{
                 color: colors.white,
@@ -118,7 +134,7 @@ const TabNavigator = () => {
               Hồ sơ
             </Text>
           ),
-          tabBarIcon: ({ color, size, focused }) => (
+          tabBarIcon: ({ size, focused }) => (
             <AntDesign
               name="user"
               size={size}

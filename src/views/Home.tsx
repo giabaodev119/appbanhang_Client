@@ -1,3 +1,4 @@
+// Cập nhật import
 import React, { FC, useEffect, useState } from "react";
 import {
   View,
@@ -7,32 +8,35 @@ import {
   Image,
 } from "react-native";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
 import {
   ActiveChat,
   addNewActiveChats,
   getUnreadChatsCount,
 } from "@store/chats";
-import { useDispatch, useSelector } from "react-redux";
-import size from "@utils/size";
 import ChatNotification from "@Ui/ChatNotification";
 import socket, { handleSocketConnection } from "src/socket";
 import { runAxiosAsync } from "@api/runAxiosAsync";
 import CategoryList from "@conponents/CategoryList";
 import LatesProductList, { LatestProduct } from "@conponents/LatesProductList";
+
 import SearchBar from "@conponents/SearchBar";
 import SearchAddressButton from "@conponents/SearchAddressButton";
 import SearchModal from "@conponents/SearchModal";
+import ShowProduct from "@conponents/SearchProduct";
+import Swiper from "react-native-swiper"; // Import Swiper
 import useAuth from "@hooks/useAuth";
 import useClient from "@hooks/useClient";
 import { AppStackParamList } from "@navigator/AppNavigator";
-import ShowProduct from "@conponents/SearchProduct";
-import Swiper from "react-native-swiper"; // Import Swiper
+import size from "@utils/size";
 import colors from "@utils/color";
 
 interface Props {}
+
 const Home: FC<Props> = () => {
   const [products, setProducts] = useState<LatestProduct[]>([]);
   const [productsByAddress, setProductsByAddress] = useState<LatestProduct[]>();
+  const [featuredProducts, setFeaturedProducts] = useState<LatestProduct[]>([]);
   const [showSearchModal, setShowSearchModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { navigate } = useNavigation<NavigationProp<AppStackParamList>>();
@@ -40,19 +44,20 @@ const Home: FC<Props> = () => {
   const { authState } = useAuth();
   const dispatch = useDispatch();
   const totalUnreadMessages = useSelector(getUnreadChatsCount);
+
   const banners = [
-    { id: 1, image: require("../../assets/images (2).png") },
-    { id: 2, image: require("../../assets/images (3).png") },
-    { id: 3, image: require("../../assets/images (4).png") },
+    { id: 1, image: require("../../assets/images (5).png") },
+    { id: 2, image: require("../../assets/images (6).png") },
+    { id: 3, image: require("../../assets/images (7).png") },
   ];
 
+  // Fetch dữ liệu sản phẩm
   const fetchLatestProduct = async () => {
     const res = await runAxiosAsync<{ products: LatestProduct[] }>(
       authClient.get("/product/latest")
     );
     if (res?.products) {
-      const availableProducts = res.products.filter((p) => !p.isSold); // Lọc sản phẩm chưa bán
-      setProducts(availableProducts);
+      setProducts(res.products.filter((p) => p.isActive && !p.isSold));
     }
   };
 
@@ -61,31 +66,43 @@ const Home: FC<Props> = () => {
       authClient.get("/product/get-byaddress")
     );
     if (res?.results) {
-      const availableProducts = res.results.filter((p) => !p.isSold); // Lọc sản phẩm chưa bán
-      setProductsByAddress(availableProducts);
+      setProductsByAddress(res.results.filter((p) => p.isActive && !p.isSold));
     }
   };
 
+  const fetchFeaturedProducts = async () => {
+    const res = await runAxiosAsync<{ products: LatestProduct[] }>(
+      authClient.get("/product/premium-products")
+    );
+    if (res?.products) {
+      setFeaturedProducts(res.products.filter((p) => p.isActive && !p.isSold));
+    }
+  };
+
+  // Làm mới dữ liệu
   const handleRefresh = async () => {
     setRefreshing(true);
-    await fetchProductByAddress();
-    await fetchLatestProduct();
+    await Promise.all([
+      fetchLatestProduct(),
+      fetchProductByAddress(),
+      fetchFeaturedProducts(),
+    ]);
     setRefreshing(false);
   };
 
   useEffect(() => {
-    const handleApiRequest = async () => {
-      await handleRefresh();
-    };
-    handleApiRequest();
+    handleRefresh(); // Gọi khi khởi tạo component
   }, []);
 
   useEffect(() => {
-    if (authState.profile) handleSocketConnection(authState.profile, dispatch);
+    if (authState.profile) {
+      handleSocketConnection(authState.profile, dispatch);
+    }
     return () => {
       socket.disconnect();
     };
   }, []);
+
   useEffect(() => {}, [products]);
 
   return (
@@ -96,11 +113,7 @@ const Home: FC<Props> = () => {
           <SearchBar asButton onPress={() => setShowSearchModal(true)} />
         </View>
         <View style={styles.searchAddressButtonContainer}>
-          <SearchAddressButton
-            onPress={() => {
-              navigate("SearchAddress");
-            }}
-          />
+          <SearchAddressButton onPress={() => navigate("SearchAddress")} />
         </View>
         <ChatNotification
           onPress={() => navigate("Chats")}
@@ -138,6 +151,18 @@ const Home: FC<Props> = () => {
           />
         </View>
 
+        {/* Featured Products */}
+        {authState.profile?.premiumStatus && featuredProducts.length > 0 && (
+          <View style={styles.sectionContainer}>
+            <ShowProduct
+              title="Sản phẩm nổi bật"
+              data={featuredProducts.slice(0, 4)}
+              // Hiển thị tối đa 4 sản phẩm
+              onPress={({ id }) => navigate("SingleProduct", { id })}
+            />
+          </View>
+        )}
+
         {/* Nearby Products */}
         {productsByAddress && productsByAddress.length > 0 && (
           <View style={styles.sectionContainer}>
@@ -168,11 +193,12 @@ const Home: FC<Props> = () => {
     </>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: size.padding,
     flex: 1,
-    backgroundColor: colors.lightGrey, // Background màu nhẹ nhàng
+    backgroundColor: colors.lightGrey,
   },
   headerContainer: {
     flexDirection: "row",
@@ -233,4 +259,5 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
+
 export default Home;

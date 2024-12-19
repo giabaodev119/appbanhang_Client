@@ -54,7 +54,18 @@ const Profile: FC<Props> = (props) => {
     navigate("UpdateProfile");
   };
   const onSubscriptionScreenPress = () => {
+    if (!authState.profile?.verified) {
+      showMessage({
+        message:
+          "Tài khoản của bạn chưa được xác minh. Vui lòng xác minh tài khoản để truy cập trang này.",
+        type: "warning",
+      });
+      return;
+    }
     navigate("SubscriptionScreen");
+  };
+  const onSavedProductsScreen = () => {
+    navigate("SavedProductsScreen");
   };
   const fetchProfile = async () => {
     setRefreshing(true);
@@ -183,6 +194,12 @@ const Profile: FC<Props> = (props) => {
         antIconName="appstore-o"
         title="Sản phẩm của bạn"
         onPress={onListingPress}
+      />
+      <ProfileOptionListItem
+        style={styles.marginBottom}
+        antIconName="appstore-o"
+        title="Sản phẩm đã lưu"
+        onPress={onSavedProductsScreen}
       />
       <ProfileOptionListItem
         antIconName="logout"

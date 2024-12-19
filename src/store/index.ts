@@ -3,12 +3,14 @@ import authReducer from "./auth";
 import listingsReducer from "./listings";
 import conversationReducer from "./conversation";
 import chatsReducer from "./chats";
+import savedProductsSlice from "./savedProductsSlice";
 
 const reducers = combineReducers({
   auth: authReducer,
   listing: listingsReducer,
   conversation: conversationReducer,
   chats: chatsReducer,
+  savedProductsSlice:savedProductsSlice,
 });
 
 const store = configureStore({ reducer: reducers });
