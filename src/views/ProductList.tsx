@@ -30,7 +30,10 @@ const ProductList: FC<Props> = ({ route, navigation }) => {
       authClient.get("/product/by-category/" + category)
     );
     if (res) {
-      setProducts(res.products);
+      const filteredProducts = res.products.filter(
+        (product) => product.isActive && !product.isSold
+      );
+      setProducts(filteredProducts);
     }
   };
   useEffect(() => {

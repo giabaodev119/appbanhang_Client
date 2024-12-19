@@ -73,7 +73,9 @@ const SearchAddress: React.FC = () => {
     }
 
     if (res?.results) {
-      const filteredResults = res.results.filter((product) => product.isActive);
+      const filteredResults = res.results.filter(
+        (product) => product.isActive && !product.isSold
+      );
       setSearchResults(filteredResults);
     } else {
       setSearchResults([]);

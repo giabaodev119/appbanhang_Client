@@ -100,6 +100,8 @@ const Home: FC<Props> = () => {
     };
   }, []);
 
+  useEffect(() => {}, [products]);
+
   return (
     <>
       {/* Header */}
@@ -154,7 +156,10 @@ const Home: FC<Props> = () => {
           <View style={styles.sectionContainer}>
             <ShowProduct
               title="Sản phẩm gần bạn"
-              data={productsByAddress.slice(0, 4)}
+              data={productsByAddress
+                .filter((product) => product.isActive)
+                .filter((p) => !p.isSold)
+                .slice(0, 4)}
               onPress={({ id }) => navigate("SingleProduct", { id })}
             />
           </View>
@@ -163,7 +168,9 @@ const Home: FC<Props> = () => {
         {/* Latest Products */}
         <View style={styles.sectionContainer}>
           <LatesProductList
-            data={products}
+            data={products
+              .filter((product) => product.isActive)
+              .filter((p) => !p.isSold)}
             onPress={({ id }) => navigate("SingleProduct", { id })}
           />
         </View>
@@ -187,11 +194,19 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     marginBottom: 10,
     paddingHorizontal: 10,
+    backgroundColor: colors.white, // Header nổi bật với màu chính
   },
   searchBarContainer: {
     flex: 6,
     marginRight: 10,
     marginLeft: 10,
+    backgroundColor: colors.white, // Nền trắng cho sự đơn giản
+    borderRadius: 10,
+    shadowColor: colors.backDropDark,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 4,
   },
   searchAddressButtonContainer: {
     flex: 1,
@@ -203,26 +218,33 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     shadowColor: colors.backDropDark,
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 4,
+    shadowOpacity: 0.2, // Tăng độ rõ của bóng
+    shadowRadius: 6,
+    elevation: 5,
   },
   bannerImage: {
     width: "100%",
     height: "100%",
     resizeMode: "cover",
+    borderRadius: 10,
   },
   sectionContainer: {
     marginBottom: 25,
     paddingVertical: 10,
-    paddingHorizontal: 5,
+    paddingHorizontal: 10,
     backgroundColor: colors.white,
     borderRadius: 10,
     shadowColor: colors.backDropDark,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
+    shadowRadius: 4,
     elevation: 3,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: colors.primary,
+    marginBottom: 10,
   },
 });
 

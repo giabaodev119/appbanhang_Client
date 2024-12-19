@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: colors.primary, // Màu chủ đạo
+    backgroundColor: colors.lightred, // Màu chủ đạo
     alignItems: "center",
   },
   buttonText: {

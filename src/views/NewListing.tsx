@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   btnTitle: {
-    color: colors.active,
+    color: colors.lightred,
     marginTop: 8,
     fontWeight: "600",
     fontSize: 14,
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderWidth: 1.5,
-    borderColor: colors.active,
+    borderColor: colors.lightred,
     borderRadius: 10,
     backgroundColor: colors.white, // Nền trắng cho nổi bật
     shadowColor: colors.backDropDark,
@@ -258,9 +258,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     fontSize: 16,
     color: colors.textMessage,
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    borderBottomWidth: 1,
     borderBottomColor: colors.borderColor,
   },
   input: {

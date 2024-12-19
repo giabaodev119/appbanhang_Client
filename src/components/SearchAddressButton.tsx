@@ -16,7 +16,7 @@ const SearchAddressButton: FC<Props> = ({ onPress, style }) => {
       }}
       style={styles.container}
     >
-      <Entypo name="address" size={24} color="black" />
+      <Entypo name="address" size={24} color={colors.lightred} />
     </Pressable>
   );
 };
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     height: 43,
     borderWidth: 1,
     borderRadius: 5,
-    borderColor: colors.primary,
+    borderColor: colors.lightred,
     justifyContent: "center",
     alignItems: "center",
   },
