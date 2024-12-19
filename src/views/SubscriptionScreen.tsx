@@ -2,7 +2,7 @@ import { runAxiosAsync } from "@api/runAxiosAsync";
 import AppHeader from "@conponents/AppHeader";
 import useAuth from "@hooks/useAuth";
 import useClient from "@hooks/useClient";
-import { Dimensions, ScrollView, Linking,Alert } from "react-native";
+import { Dimensions, ScrollView, Linking, Alert } from "react-native";
 import BackButton from "@Ui/BackBotton";
 import React, { FC, useEffect, useState } from "react";
 import {
@@ -20,22 +20,26 @@ const plans = [
   {
     name: "HV_1M",
     price: 50000,
-    priceInfo: "50000/1 tháng. Được nhận ưu đãi hàng tháng nhiều hơn và thời gian đăng bán dài lâu.",
+    priceInfo:
+      "50000/1 tháng. Được nhận ưu đãi hàng tháng nhiều hơn và thời gian đăng bán dài lâu.",
   },
   {
     name: "HV_3M",
     price: 150000,
-    priceInfo: "150000/3 tháng. Được nhận ưu đãi hàng tháng nhiều hơn và thời gian đăng bán dài lâu.",
+    priceInfo:
+      "150000/3 tháng. Được nhận ưu đãi hàng tháng nhiều hơn và thời gian đăng bán dài lâu.",
   },
   {
     name: "HV_6M",
     price: 280000,
-    priceInfo: "280000/6 tháng. Được nhận ưu đãi hàng tháng nhiều hơn và thời gian đăng bán dài lâu.",
+    priceInfo:
+      "280000/6 tháng. Được nhận ưu đãi hàng tháng nhiều hơn và thời gian đăng bán dài lâu.",
   },
   {
     name: "HV_12M",
     price: 550000,
-    priceInfo: "550000/năm. Được nhận ưu đãi hàng tháng nhiều hơn và thời gian đăng bán dài lâu.",
+    priceInfo:
+      "550000/năm. Được nhận ưu đãi hàng tháng nhiều hơn và thời gian đăng bán dài lâu.",
   },
 ];
 
@@ -44,16 +48,16 @@ type hv = {
   price: number;
   priceInfo: string;
 };
-type Props = NativeStackScreenProps<ProfileNavigatorParamList, "SubscriptionScreen">;
+type Props = NativeStackScreenProps<
+  ProfileNavigatorParamList,
+  "SubscriptionScreen"
+>;
 
-
-const SubscriptionScreen: FC<Props> = ({navigation}) => {
+const SubscriptionScreen: FC<Props> = ({ navigation }) => {
   const [selectedPlan, setSelectedPlan] = useState<hv>(plans[0]);
-  const [htmlContent, setHtmlContent] = useState<string | any>(null);
   const { authState } = useAuth();
   const dispatch = useDispatch();
   const { authClient } = useClient();
-  const [busy, setBusy] = useState(false);
   const [input, setInput] = useState({
     amount: plans[0].price,
     bankCode: "VNBANK",
@@ -64,13 +68,9 @@ const SubscriptionScreen: FC<Props> = ({navigation}) => {
 
   const isVip = authState.profile?.premiumStatus?.isAvailable;
 
-
-
   const onSelectedPlan = (plan: hv) => {
     setSelectedPlan(plan);
     setInput({ ...input, amount: plan.price, planName: plan.name });
-    console.log(input);
-    console.log(plan);
   };
 
   const onSubmit = async () => {
@@ -96,11 +96,8 @@ const SubscriptionScreen: FC<Props> = ({navigation}) => {
     } else {
       console.error("Invalid URL in response");
     }
-
   };
   const onCancel = async () => {
-
-
     Alert.alert(
       "Confirm Cancellation",
       "Are you sure you want to cancel your subscription?",
@@ -108,7 +105,7 @@ const SubscriptionScreen: FC<Props> = ({navigation}) => {
         {
           text: "No",
           onPress: () => console.log("Cancellation aborted"),
-          style: "cancel"
+          style: "cancel",
         },
         {
           text: "Yes",
@@ -120,17 +117,18 @@ const SubscriptionScreen: FC<Props> = ({navigation}) => {
 
             if (res && res.success) {
               console.log("Subscription canceled");
-              dispatch(updateAuthState({ profile: res.profile, pending: false }));
+              dispatch(
+                updateAuthState({ profile: res.profile, pending: false })
+              );
               navigation.navigate("Profile");
             } else {
               console.error("Failed to cancel subscription");
             }
-          }
-        }
+          },
+        },
       ],
       { cancelable: false }
     );
-    
   };
 
   useEffect(() => {
@@ -152,7 +150,9 @@ const SubscriptionScreen: FC<Props> = ({navigation}) => {
       <View style={styles.container}>
         <Text style={styles.header}>Hãy lựa chọn gói hội viên cho bạn</Text>
         <Text style={styles.subHeader}>
-          Được ưu tiên đề xuất trên trang chính{"\n"}Thời gian đăng bán lâu hơn gấp 3 lần{"\n"}Không giới hạn bài đăng
+          Được ưu tiên đề xuất trên trang chính{"\n"}Thời gian đăng bán lâu hơn
+          gấp 3 lần{"\n"}Không giới hạn bài đăng Được ưu tiên đề xuất trên trang
+          chính{"\n"}Thời gian đăng bán lâu hơn gấp 3 lần
         </Text>
 
         {/* Plans */}
@@ -160,10 +160,10 @@ const SubscriptionScreen: FC<Props> = ({navigation}) => {
           {plans.map((plan) => (
             <TouchableOpacity
               key={plan.name}
-              style={
-                [styles.planBox,
-                selectedPlan.name === plan.name && styles.planBoxSelected,]
-              }
+              style={[
+                styles.planBox,
+                selectedPlan.name === plan.name && styles.planBoxSelected,
+              ]}
               onPress={() => onSelectedPlan(plan)}
               disabled={isVip}
             >
@@ -185,10 +185,7 @@ const SubscriptionScreen: FC<Props> = ({navigation}) => {
           Không tự động gia hạn. Hủy bất cứ lúc nào.
         </Text>
         {isVip ? (
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={onCancel}
-          >
+          <TouchableOpacity style={styles.cancelButton} onPress={onCancel}>
             <Text style={styles.cancelText}>Hủy</Text>
           </TouchableOpacity>
         ) : (
@@ -201,7 +198,6 @@ const SubscriptionScreen: FC<Props> = ({navigation}) => {
     </>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -256,7 +252,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#888",
     textAlign: "center",
-    
   },
   startTrialButton: {
     marginTop: 15,
@@ -290,6 +285,5 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
 });
-
 
 export default SubscriptionScreen;

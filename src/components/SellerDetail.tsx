@@ -5,8 +5,17 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  TouchableOpacity,
+  Image,
+  ImageBackgroundBase,
+  ImageBackground,
 } from "react-native";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import { AppStackParamList } from "@navigator/AppNavigator";
 import colors from "@utils/color";
 import size from "@utils/size";
@@ -23,12 +32,16 @@ import BackButton from "@Ui/BackBotton";
 import { formatDate } from "@utils/date";
 
 const SellerDetail: FC = () => {
+  const imageUrl =
+    "https://cdn-media.sforum.vn/storage/app/media/ctv_seo3/mau-background-dep-3.jpg";
   const route = useRoute<RouteProp<AppStackParamList, "SellerDetail">>();
   const { id } = route.params;
 
   const [seller, setSeller] = useState<AdminUser | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("products");
+  const { navigate } = useNavigation<NavigationProp<AppStackParamList>>();
   const { authClient } = useClient();
 
   // Fetch dữ liệu từ backend
@@ -40,7 +53,6 @@ const SellerDetail: FC = () => {
         products: Product[];
       }>(authClient.get(`/product/get-byseller?id=${id}`));
       if (res) {
-        
         setSeller(res.owner);
         setProducts(res.products);
       } else {
@@ -72,49 +84,94 @@ const SellerDetail: FC = () => {
   }
 
   // Lọc sản phẩm theo trạng thái isSold
-  const availableProducts = products.filter((product) => product.isSold === false); // Sản phẩm chưa bán
+  const availableProducts = products.filter(
+    (product) => product.isSold === false
+  ); // Sản phẩm chưa bán
   const soldProducts = products.filter((product) => product.isSold === true); // Sản phẩm đã bán
-  
+
   return (
     <>
       <AppHeader backButton={<BackButton />} />
       <View style={styles.fullBackground}>
         <View style={styles.sellerHeader}>
-          {seller && (
-            <View style={styles.profileContainer}>
-              <AvatarView uri={seller.avatar} size={100} />
-              <View style={styles.profileInfo}>
-                <Text style={styles.name}>{seller.name}</Text>
-                <Text style={styles.email}>{seller.email}</Text>
-                <Text style={styles.address}>
-                  Địa chỉ: {replacedAddress(seller.address)}
-                </Text>
-                <Text style={styles.createdAt}>
-                  Tạo tài khoản: {formatDate(seller.createdAt)}
-                </Text>
+          <ImageBackground source={{ uri: imageUrl }}>
+            {seller && (
+              <View style={styles.profileContainer}>
+                <AvatarView
+                  uri={seller.avatar}
+                  size={100}
+                  isVip={seller.premiumStatus?.isAvailable}
+                />
+                <View style={styles.profileInfo}>
+                  <Text style={styles.name}>{seller.name}</Text>
+                  <Text style={styles.email}>{seller.email}</Text>
+                  <Text style={styles.address}>
+                    Địa chỉ: {replacedAddress(seller.address)}
+                  </Text>
+                  <Text style={styles.createdAt}>
+                    Tạo tài khoản: {formatDate(seller.createdAt)}
+                  </Text>
+                </View>
               </View>
-            </View>
-          )}
+            )}
+          </ImageBackground>
+        </View>
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[styles.tab, activeTab === "products" && styles.activeTab]}
+            onPress={() => setActiveTab("products")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === "products" && styles.activeTabText,
+              ]}
+            >
+              Sản phẩm
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.tab,
+              activeTab === "soldProducts" && styles.activeTab,
+            ]}
+            onPress={() => setActiveTab("soldProducts")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                activeTab === "soldProducts" && styles.activeTabText,
+              ]}
+            >
+              Đã bán
+            </Text>
+          </TouchableOpacity>
         </View>
         <ScrollView contentContainerStyle={styles.container}>
-          <View style={styles.rowContainer}>
-            {/* Sản phẩm chưa bán */}
-            <View style={styles.productSection}>
-              <ShowProduct data={availableProducts} title="Sản phẩm của người bán" />
-            </View>
-
-            {/* Sản phẩm đã bán */}
+          {activeTab === "products" ? (
+            <ShowProduct
+              data={products}
+              title="Sản phẩm của người bán"
+              onPress={({ id }) => navigate("SingleProduct", { id })}
+            />
+          ) : (
             <View style={styles.soldProductSection}>
               <Text style={styles.productTitle}>Sản phẩm đã bán:</Text>
-              <View style={styles.productList}>
-                {soldProducts.map((product, index) => (
-                  <Text key={index} style={styles.productName}>
-                    {product.name}
-                  </Text>
-                ))}
-              </View>
+              {products.filter((product) => product.isSold).length > 0 ? (
+                products
+                  .filter((product) => product.isSold)
+                  .map((product, index) => (
+                    <View key={index} style={styles.productRow}>
+                      <Text style={styles.productName} numberOfLines={1}>
+                        {index + 1}. {product.name}
+                      </Text>
+                    </View>
+                  ))
+              ) : (
+                <Text style={styles.noProductText}>Không có sản phẩm nào.</Text>
+              )}
             </View>
-          </View>
+          )}
         </ScrollView>
       </View>
     </>
@@ -127,7 +184,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f4f4f4",
   },
   sellerHeader: {
-    backgroundColor: "#4a90e2",
     paddingBottom: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
@@ -171,32 +227,79 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     textAlign: "left",
   },
-  rowContainer: {
+  tabContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: size.padding,
+    justifyContent: "space-around",
+    backgroundColor: "#ffffff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#dddddd",
   },
-  productSection: {
-    flexDirection: "column",
-    width: "100%",
+  tab: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  activeTab: {
+    borderBottomWidth: 2,
+    borderBottomColor: colors.primary,
+  },
+  tabText: {
+    fontSize: 16,
+    color: "#555555",
+  },
+  activeTabText: {
+    color: colors.primary,
+    fontWeight: "bold",
   },
   soldProductSection: {
-    width: "60%",
+    padding: size.padding,
   },
   productTitle: {
     fontSize: 18,
     fontWeight: "600",
     color: "#000000",
-    marginTop: 15,
     marginBottom: 5,
   },
-  productList: {
-    marginTop: 10,
+  productGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
+  productCard: {
+    width: "48%",
+    backgroundColor: "#ffffff",
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  productRow: {
+    padding: 15, // Tăng khoảng cách để nội dung thoáng hơn
+    marginVertical: 8, // Tạo khoảng cách giữa các dòng
+    borderWidth: 1, // Thêm viền để nổi bật hơn
+    borderColor: "#dddddd",
+    borderRadius: 10, // Bo góc viền
+    backgroundColor: "#f9f9f9", // Màu nền nhẹ
+    shadowColor: "#000", // Thêm bóng cho hiệu ứng nổi
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3, // Bóng trên Android
+  },
+
   productName: {
     fontSize: 16,
     color: "#333333",
-    marginTop: 5,
+  },
+  noProductText: {
+    fontSize: 16,
+    color: "#999999",
+    textAlign: "center",
+    marginTop: 20,
   },
   container: {
     padding: size.padding,

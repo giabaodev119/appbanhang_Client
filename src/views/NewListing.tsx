@@ -18,6 +18,7 @@ import { selectImages } from "@utils/helper";
 import CategoryOptions from "@conponents/CategoryOptions";
 import ProvinceOptions from "@conponents/ProvinceOptions";
 import DistrictOptions from "@conponents/DistrictOptions";
+import useAuth from "@hooks/useAuth";
 
 interface Props {}
 
@@ -45,12 +46,7 @@ const NewListing: FC<Props> = (props) => {
   const [images, setImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState("");
   const { authClient } = useClient();
-
-  // Giả định premiumStatus được lấy từ API hoặc authState
-  const [premiumStatus, setPremiumStatus] = useState<{ isAvailable: boolean }>({
-    isAvailable: false,
-  });
-
+  const { authState } = useAuth();
   const {
     category,
     name,
@@ -185,7 +181,7 @@ const NewListing: FC<Props> = (props) => {
         <AppButton title="Thêm sản phẩm" onPress={handleSubmit} />
 
         {/* Thông báo nếu không phải tài khoản premium */}
-        {!premiumStatus.isAvailable && (
+        {!authState.profile?.premiumStatus?.isAvailable && (
           <Text style={styles.noticeText}>
             Tài khoản thường chỉ được đăng miễn phí 10 sản phẩm mỗi tháng.
           </Text>
@@ -221,7 +217,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   btnTitle: {
-    color: colors.active,
+    color: colors.lightred,
     marginTop: 8,
     fontWeight: "600",
     fontSize: 14,
@@ -232,7 +228,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderWidth: 1.5,
-    borderColor: colors.active,
+    borderColor: colors.lightred,
     borderRadius: 10,
     backgroundColor: colors.white, // Nền trắng cho nổi bật
     shadowColor: colors.backDropDark,
@@ -258,9 +254,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     fontSize: 16,
     color: colors.textMessage,
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    borderBottomWidth: 1,
     borderBottomColor: colors.borderColor,
   },
   input: {

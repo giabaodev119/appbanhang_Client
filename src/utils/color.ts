@@ -7,6 +7,8 @@ const active = "#0081f1";
 const lightGrey = "#f0f0f0";
 const borderColor = "#e0e0e0";
 const textMessage = "#333";
+const gold = "#FFD700";
+const lightred = "#ff2d55";
 
 const colors = {
   primary,
@@ -18,6 +20,8 @@ const colors = {
   lightGrey,
   borderColor,
   textMessage,
+  gold,
+  lightred,
 };
 
 export default colors;

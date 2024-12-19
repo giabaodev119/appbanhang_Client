@@ -1,5 +1,11 @@
 import { FC } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  StyleProp,
+  ViewStyle,
+} from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import colors from "@utils/color";
 import LottieView from "lottie-react-native";
@@ -40,7 +46,7 @@ const styles = StyleSheet.create({
   },
   messageBtn: {
     borderRadius: 25,
-    backgroundColor: colors.active,
+    backgroundColor: colors.lightred,
     justifyContent: "center",
     alignItems: "center",
   },

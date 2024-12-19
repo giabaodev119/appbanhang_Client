@@ -81,9 +81,8 @@ const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn d
   };
 
   const fetchFeaturedProducts = async () => {
-    if (!authState.profile?.premiumStatus) return; // Chỉ gọi API nếu là Premium
     const res = await runAxiosAsync<{ products: LatestProduct[] }>(
-      authClient.get("/product/latest")
+      authClient.get("/product/premium-products")
     );
     if (res?.products) {
       setFeaturedProducts(res.products.filter((p) => p.isActive && !p.isSold));
@@ -93,12 +92,20 @@ const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn d
   // Làm mới dữ liệu
   const handleRefresh = async () => {
     setRefreshing(true);
+<<<<<<< HEAD
   setCurrentPage(1);
   setHasMore(true);
   setProducts([]); // Xóa danh sách cũ
   await fetchLatestProduct(1); // Gọi lại trang đầu tiên
   setRefreshing(false);
     await Promise.all([fetchLatestProduct(), fetchProductByAddress(), fetchFeaturedProducts()]);
+=======
+    await Promise.all([
+      fetchLatestProduct(),
+      fetchProductByAddress(),
+      fetchFeaturedProducts(),
+    ]);
+>>>>>>> origin/main
     setRefreshing(false);
   };
 
@@ -114,6 +121,8 @@ const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn d
       socket.disconnect();
     };
   }, []);
+
+  useEffect(() => {}, [products]);
 
   return (
     <>
@@ -139,9 +148,18 @@ const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn d
         }
       >
         {/* Banner Swiper */}
-        <Swiper style={styles.swiper} autoplay autoplayTimeout={3} showsPagination>
+        <Swiper
+          style={styles.swiper}
+          autoplay
+          autoplayTimeout={3}
+          showsPagination
+        >
           {banners.map((banner) => (
-            <Image key={banner.id} source={banner.image} style={styles.bannerImage} />
+            <Image
+              key={banner.id}
+              source={banner.image}
+              style={styles.bannerImage}
+            />
           ))}
         </Swiper>
 
@@ -158,7 +176,7 @@ const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn d
             <ShowProduct
               title="Sản phẩm nổi bật"
               data={featuredProducts.slice(0, 4)}
-             // Hiển thị tối đa 4 sản phẩm
+              // Hiển thị tối đa 4 sản phẩm
               onPress={({ id }) => navigate("SingleProduct", { id })}
             />
           </View>
@@ -169,7 +187,10 @@ const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn d
           <View style={styles.sectionContainer}>
             <ShowProduct
               title="Sản phẩm gần bạn"
-              data={productsByAddress.slice(0, 4)}
+              data={productsByAddress
+                .filter((product) => product.isActive)
+                .filter((p) => !p.isSold)
+                .slice(0, 4)}
               onPress={({ id }) => navigate("SingleProduct", { id })}
             />
           </View>
@@ -177,6 +198,7 @@ const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn d
 
         {/* Latest Products */}
         <View style={styles.sectionContainer}>
+<<<<<<< HEAD
         <LatesProductList
     data={products}
     onPress={({ id }) => navigate("SingleProduct", { id })}
@@ -192,6 +214,14 @@ const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn d
       />
     </View>
   )}
+=======
+          <LatesProductList
+            data={products
+              .filter((product) => product.isActive)
+              .filter((p) => !p.isSold)}
+            onPress={({ id }) => navigate("SingleProduct", { id })}
+          />
+>>>>>>> origin/main
         </View>
       </ScrollView>
 
@@ -213,11 +243,19 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     marginBottom: 10,
     paddingHorizontal: 10,
+    backgroundColor: colors.white, // Header nổi bật với màu chính
   },
   searchBarContainer: {
     flex: 6,
     marginRight: 10,
     marginLeft: 10,
+    backgroundColor: colors.white, // Nền trắng cho sự đơn giản
+    borderRadius: 10,
+    shadowColor: colors.backDropDark,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 4,
   },
   searchAddressButtonContainer: {
     flex: 1,
@@ -229,30 +267,39 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     shadowColor: colors.backDropDark,
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 4,
+    shadowOpacity: 0.2, // Tăng độ rõ của bóng
+    shadowRadius: 6,
+    elevation: 5,
   },
   bannerImage: {
     width: "100%",
     height: "100%",
     resizeMode: "cover",
+    borderRadius: 10,
   },
   sectionContainer: {
     marginBottom: 25,
     paddingVertical: 10,
-    paddingHorizontal: 5,
+    paddingHorizontal: 10,
     backgroundColor: colors.white,
     borderRadius: 10,
     shadowColor: colors.backDropDark,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.1,
-    shadowRadius: 5,
+    shadowRadius: 4,
     elevation: 3,
   },
+<<<<<<< HEAD
   loadMoreContainer: {
     marginTop: 10,
     alignItems: "center",
+=======
+  title: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: colors.primary,
+    marginBottom: 10,
+>>>>>>> origin/main
   },
 });
 

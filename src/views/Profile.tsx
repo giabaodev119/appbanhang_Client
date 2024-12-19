@@ -54,11 +54,19 @@ const Profile: FC<Props> = (props) => {
     navigate("UpdateProfile");
   };
   const onSubscriptionScreenPress = () => {
+    if (!authState.profile?.verified) {
+      showMessage({
+        message:
+          "Tài khoản của bạn chưa được xác minh. Vui lòng xác minh tài khoản để truy cập trang này.",
+        type: "warning",
+      });
+      return;
+    }
     navigate("SubscriptionScreen");
   };
-  const onSavedProductsScreen=()=>{
-    navigate("SavedProductsScreen")
-  }
+  const onSavedProductsScreen = () => {
+    navigate("SavedProductsScreen");
+  };
   const fetchProfile = async () => {
     setRefreshing(true);
     const res = await runAxiosAsync<{ profile: ProfileRes }>(
@@ -155,6 +163,7 @@ const Profile: FC<Props> = (props) => {
           uri={authState.profile?.avatar}
           size={80}
           onPress={handleProfileImageSelection}
+          isVip={authState.profile?.premiumStatus?.isAvailable} // Kiểm tra thuộc tính VIP
         />
         <View style={styles.profileInfo}>
           <View style={styles.nameContainer}>
@@ -172,7 +181,6 @@ const Profile: FC<Props> = (props) => {
         antIconName="gift"
         title="Hội Viên"
         onPress={onSubscriptionScreenPress}
-       
       />
       <ProfileOptionListItem
         style={styles.marginBottom}

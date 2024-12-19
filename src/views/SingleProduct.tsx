@@ -5,7 +5,7 @@ import useAuth from "@hooks/useAuth";
 import { ProfileNavigatorParamList } from "@navigator/ProfileNavigator";
 import BackButton from "@Ui/BackBotton";
 import OptionButton from "@Ui/OptionButton";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FC } from "react";
 import { View, StyleSheet, Text, Alert, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
@@ -21,6 +21,8 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Product } from "./EditProduct";
 import { addSavedProduct } from "@store/savedProductsSlice";
 import { Linking } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import PhoneIcon from "@conponents/PhoneIcon";
 
 type Props = NativeStackScreenProps<ProfileNavigatorParamList, "SingleProduct">;
 
@@ -122,6 +124,23 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      navigation.getParent()?.setOptions({ tabBarStyle: { display: "none" } });
+
+      return () => {
+        navigation.getParent()?.setOptions({
+          tabBarStyle: {
+            height: 60,
+            position: "absolute",
+            borderTopWidth: 0,
+            backgroundColor: "white",
+            elevation: 5,
+          },
+        });
+      };
+    }, [navigation])
+  );
   useEffect(() => {
     if (id) fectchProductInfo(id);
     if (product) setProductInfo(product);
@@ -159,42 +178,43 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
       />
       <View style={styles.container}>
         {productInfo ? <ProductDetail product={productInfo} /> : <></>}
-          
-        {productInfo?.isSold && (
-        <View style={styles.soldNotification}>
-          <Text style={styles.soldNotificationText}>Sản phẩm đã bán</Text>
-        </View>
-      )}
 
-{!isAdmin && productInfo?.seller.phoneNumber && (
-      <TouchableOpacity style={styles.callButton} onPress={onCallSeller}>
-        <Feather name="phone" size={20} color={colors.white} />
-        <Text style={styles.callButtonText}>Gọi người bán</Text>
-      </TouchableOpacity>
-    )}
+        {productInfo?.isSold && (
+          <View style={styles.soldNotification}>
+            <Text style={styles.soldNotificationText}>Sản phẩm đã bán</Text>
+          </View>
+        )}
+
+        {!isAdmin && productInfo?.seller.phoneNumber && (
+          <PhoneIcon onPress={onCallSeller} />
+        )}
         {!isAdmin && (
           <ChatIcon onPress={onChatBtnPress} busy={fetchingChatID} />
         )}
-         {/* Nút gọi điện chỉ hiển thị cho người mua */}
+        {/* Nút gọi điện chỉ hiển thị cho người mua */}
 
-            {/* Nút lưu sản phẩm, chỉ hiển thị cho người mua */}
-      {!isAdmin && (
-        <TouchableOpacity
-          style={[
-            styles.saveButton,
-            saved && { backgroundColor: colors.active }, // Đổi màu nếu đã lưu
-          ]}
-          onPress={handleSaveProduct}
-          disabled={saved} // Vô hiệu hóa nếu đã lưu
-        >
-          <Feather name={saved ? "check-circle" : "bookmark"} size={20} color={colors.white} />
-          <Text style={styles.saveButtonText}>
-            {saved ? "Đã lưu" : "Lưu sản phẩm"}
-          </Text>
-        </TouchableOpacity>
-      )}
+        {/* Nút lưu sản phẩm, chỉ hiển thị cho người mua */}
+        {!isAdmin && (
+          <TouchableOpacity
+            style={[
+              styles.saveButton,
+              saved && { backgroundColor: colors.active }, // Đổi màu nếu đã lưu
+            ]}
+            onPress={handleSaveProduct}
+            disabled={saved} // Vô hiệu hóa nếu đã lưu
+          >
+            <Feather
+              name={saved ? "check-circle" : "bookmark"}
+              size={20}
+              color={colors.white}
+            />
+            <Text style={styles.saveButtonText}>
+              {saved ? "Đã lưu" : "Lưu sản phẩm"}
+            </Text>
+          </TouchableOpacity>
+        )}
         {/* Nút đánh dấu đã bán, chỉ hiển thị cho người bán */}
-        {isAdmin && !productInfo?.isSold &&(
+        {isAdmin && !productInfo?.isSold && (
           <TouchableOpacity
             style={styles.soldButton}
             onPress={handleMarkAsSold}
@@ -206,7 +226,7 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
 
       <OptionModal
         options={menuOption}
-        renderItem={({ icon, name, }) => (
+        renderItem={({ icon, name }) => (
           <View style={styles.option}>
             {icon}
             <Text style={styles.optionTitle}>{name}</Text>
@@ -277,21 +297,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   saveButtonText: {
-    color: colors.white,
-    fontWeight: "bold",
-    marginLeft: 10,
-  },
-  callButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    alignSelf: "center",
-    marginTop: 20,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    backgroundColor: colors.primary,
-    borderRadius: 5,
-  },
-  callButtonText: {
     color: colors.white,
     fontWeight: "bold",
     marginLeft: 10,

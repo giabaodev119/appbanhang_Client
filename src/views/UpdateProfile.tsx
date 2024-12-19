@@ -11,9 +11,7 @@ import FormInput from "@Ui/FormInput";
 import useClient from "@hooks/useClient";
 import { runAxiosAsync } from "@api/runAxiosAsync";
 import { selectImages } from "@utils/helper";
-import AppButton from "@Ui/AppButton";
 import { profileSchema, yupValidate } from "@utils/validator";
-import * as yup from "yup";
 import { showMessage } from "react-native-flash-message";
 import mime from "mime";
 import LoadingSpinner from "@Ui/LoadingSpinner";
@@ -34,6 +32,7 @@ const defaultInfo = {
   name: "",
   provinceName: "",
   districtName: "",
+  phoneNumber: "",
 };
 
 const UpdateProfile: FC<Props> = ({ navigation }) => {
@@ -41,6 +40,7 @@ const UpdateProfile: FC<Props> = ({ navigation }) => {
   const { profile } = authState;
   const [userName, setUserName] = useState(profile?.name || "");
   const [email, setEmail] = useState(profile?.email || "");
+  const [phoneNumber, setPhoneNumber] = useState(profile?.phoneNumber || "");
   const [avatar, setAvatar] = useState(profile?.avatar || "");
   const [address, setAddress] = useState(profile?.address || ""); // New state variable for address
   const [busy, setBusy] = useState(false);
@@ -68,6 +68,7 @@ const UpdateProfile: FC<Props> = ({ navigation }) => {
       name: userName,
       provinceName: city,
       districtName: district,
+      phoneNumber: phoneNumber,
     };
 
     const { error } = await yupValidate(profileSchema, dataToUpdate);
@@ -77,6 +78,7 @@ const UpdateProfile: FC<Props> = ({ navigation }) => {
     formData.append("name", userName);
     formData.append("provinceName", city);
     formData.append("districtName", district);
+    formData.append("phoneNumber", phoneNumber);
 
     setBusy(true);
     const res = await runAxiosAsync<{ profile: typeof profile }>(
@@ -154,6 +156,12 @@ const UpdateProfile: FC<Props> = ({ navigation }) => {
             // Disable email input
             editable={false}
           />
+          <FormInput
+            placeholder="Phone number"
+            value={phoneNumber}
+            onChangeText={(phoneNumber) => setPhoneNumber(phoneNumber)}
+            keyboardType="numeric"
+          />
 
           <ProvinceOptions
             onSelect={(province: tinh) => {
@@ -202,7 +210,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     paddingVertical: 12,
     borderRadius: 8,
-    backgroundColor: colors.primary, // Màu chủ đạo
+    backgroundColor: colors.lightred, // Màu chủ đạo
     alignItems: "center",
   },
   buttonText: {
