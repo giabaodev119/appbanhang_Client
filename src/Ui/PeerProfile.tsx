@@ -6,13 +6,17 @@ import colors from "@utils/color";
 interface Props {
   name: string;
   avatar?: string;
+  phoneNumber: string;
 }
 
-const PeerProfile: FC<Props> = ({ name, avatar }) => {
+const PeerProfile: FC<Props> = ({ name, avatar, phoneNumber }) => {
   return (
     <View style={styles.container}>
       <AvatarView size={40} uri={avatar} />
-      <Text style={styles.name}>{name}</Text>
+      <View style={styles.textContainer}>
+        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.phoneNumber}>{phoneNumber}</Text>
+      </View>
     </View>
   );
 };
@@ -24,11 +28,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
+  textContainer: {
+    flexDirection: "column",
+    paddingLeft: 10,
+  },
   name: {
     color: colors.primary,
-    paddingLeft: 10,
     fontSize: 16,
     fontWeight: "700",
+  },
+  phoneNumber: {
+    color: colors.primary, // Add a secondary color for contrast
+    fontSize: 14,
+    fontWeight: "400",
+    marginTop: 2,
   },
 });
 

@@ -40,12 +40,16 @@ const imageOptions = [{ value: "Remove Image", id: "remove" }];
 const NewListing: FC<Props> = (props) => {
   const [productInfo, setProductInfo] = useState({ ...defaultInfo });
   const [tinhInfo, setTinhInfo] = useState<tinh | undefined>(undefined);
-
   const [showImageOptions, setShowImageOptions] = useState(false);
   const [busy, setBusy] = useState(false);
   const [images, setImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState("");
   const { authClient } = useClient();
+
+  // Giả định premiumStatus được lấy từ API hoặc authState
+  const [premiumStatus, setPremiumStatus] = useState<{ isAvailable: boolean }>({
+    isAvailable: false,
+  });
 
   const {
     category,
@@ -105,11 +109,13 @@ const NewListing: FC<Props> = (props) => {
     const newImages = await selectImages();
     setImages([...images, ...newImages]);
   };
+
   useEffect(() => {
     if (provinceCode !== undefined) {
       console.log(provinceCode); // Logs the updated value
     }
   }, [provinceCode]);
+
   return (
     <CustomKeyAvoidingView>
       <View style={styles.container}>
@@ -177,6 +183,14 @@ const NewListing: FC<Props> = (props) => {
           onChangeText={handleChange("description")}
         />
         <AppButton title="Thêm sản phẩm" onPress={handleSubmit} />
+
+        {/* Thông báo nếu không phải tài khoản premium */}
+        {!premiumStatus.isAvailable && (
+          <Text style={styles.noticeText}>
+            Tài khoản thường chỉ được đăng miễn phí 10 sản phẩm mỗi tháng.
+          </Text>
+        )}
+
         <OptionModal
           visible={showImageOptions}
           onRequestClose={setShowImageOptions}
@@ -265,6 +279,13 @@ const styles = StyleSheet.create({
   buttonText: {
     color: colors.white,
     fontSize: 16,
+    fontWeight: "600",
+  },
+  noticeText: {
+    marginTop: 10,
+    color: colors.textMessage,
+    textAlign: "center",
+    fontSize: 14,
     fontWeight: "600",
   },
 });

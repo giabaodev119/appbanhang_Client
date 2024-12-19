@@ -43,6 +43,7 @@ const SellerDetail: FC = () => {
         products: Product[];
       }>(authClient.get(`/product/get-byseller?id=${id}`));
       if (res) {
+        
         setSeller(res.owner);
         setProducts(res.products);
       } else {
@@ -73,6 +74,10 @@ const SellerDetail: FC = () => {
     );
   }
 
+  // Lọc sản phẩm theo trạng thái isSold
+  const availableProducts = products.filter((product) => product.isSold === false); // Sản phẩm chưa bán
+  const soldProducts = products.filter((product) => product.isSold === true); // Sản phẩm đã bán
+  
   return (
     <>
       <AppHeader backButton={<BackButton />} />
@@ -159,10 +164,10 @@ const SellerDetail: FC = () => {
 const styles = StyleSheet.create({
   fullBackground: {
     flex: 1,
-    backgroundColor: "#f4f4f4", // Nền toàn màn hình
+    backgroundColor: "#f4f4f4",
   },
   sellerHeader: {
-    backgroundColor: "#4a90e2", // Màu nền mới (xanh nhạt)
+    backgroundColor: "#4a90e2",
     paddingBottom: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
@@ -171,10 +176,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f4f4f4", // Nền khi đang tải
+    backgroundColor: "#f4f4f4",
   },
   profileContainer: {
-    alignItems: "flex-start", // Căn lề trái toàn bộ
+    alignItems: "flex-start",
     padding: 20,
   },
   profileInfo: {
@@ -184,12 +189,12 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 24,
     fontWeight: "700",
-    color: "#ffffff", // Màu chữ trắng
+    color: "#ffffff",
     textAlign: "left",
   },
   email: {
     fontSize: 16,
-    color: "#e1e1e1", // Màu chữ xám nhạt
+    color: "#e1e1e1",
     marginTop: 5,
     textAlign: "left",
   },

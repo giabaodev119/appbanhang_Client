@@ -41,10 +41,12 @@ export type Product = {
   address?: string;
   isActive: boolean;
   isSold:boolean;
+  isFavorite:boolean;
   seller: {
     id: string;
     name: string;
     avatar?: string;
+    phoneNumber: string;
   };
 };
 
