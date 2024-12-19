@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     width: "100%",
-    backgroundColor: colors.deActive,
+    backgroundColor: colors.lightGrey,
     padding: 10,
     borderRadius: 7,
     maxHeight: 200,

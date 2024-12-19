@@ -15,7 +15,6 @@ import RecentChat, { Separator } from "@conponents/RecentChat";
 import size from "@utils/size";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { ProfileNavigatorParamList } from "@navigator/ProfileNavigator";
-import { runAxiosAsync } from "@api/runAxiosAsync";
 import colors from "@utils/color";
 
 interface Props {}

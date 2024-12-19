@@ -45,7 +45,7 @@ const SearchBar: FC<Props> = ({
         )}
       </Pressable>
       <Pressable onPress={onSubmit} style={styles.searchButton}>
-        <AntDesign name="search1" size={24} color={colors.primary} />
+        <AntDesign name="search1" size={24} color={colors.lightred} />
       </Pressable>
     </View>
   );
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     borderWidth: 1,
     borderRadius: 5,
-    borderColor: colors.primary,
+    borderColor: colors.lightred,
     padding: 8,
     alignItems: "center",
   },

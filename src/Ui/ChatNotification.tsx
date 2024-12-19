@@ -20,7 +20,7 @@ const ChatNotification: FC<Props> = ({ indicate, onPress }) => {
       <MaterialCommunityIcons
         name="message"
         size={24}
-        color={indicate ? colors.active : colors.primary}
+        color={indicate ? colors.active : colors.lightred}
       />
       {indicate && <View style={styles.indicator} />}
     </Pressable>
@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     height: 43,
     borderWidth: 1,
     borderRadius: 5,
-    borderColor: colors.primary,
+    borderColor: colors.lightred,
     justifyContent: "center",
     alignItems: "center",
     marginHorizontal: 15,

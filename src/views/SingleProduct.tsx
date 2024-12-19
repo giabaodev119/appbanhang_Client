@@ -5,7 +5,7 @@ import useAuth from "@hooks/useAuth";
 import { ProfileNavigatorParamList } from "@navigator/ProfileNavigator";
 import BackButton from "@Ui/BackBotton";
 import OptionButton from "@Ui/OptionButton";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { FC } from "react";
 import { View, StyleSheet, Text, Alert, TouchableOpacity } from "react-native";
 import { Feather } from "@expo/vector-icons";
@@ -19,6 +19,7 @@ import { deleteItem } from "@store/listings";
 import ChatIcon from "@conponents/ChatIcon";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Product } from "./EditProduct";
+import { useFocusEffect } from "@react-navigation/native";
 
 type Props = NativeStackScreenProps<ProfileNavigatorParamList, "SingleProduct">;
 
@@ -119,6 +120,23 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      navigation.getParent()?.setOptions({ tabBarStyle: { display: "none" } });
+
+      return () => {
+        navigation.getParent()?.setOptions({
+          tabBarStyle: {
+            height: 60,
+            position: "absolute",
+            borderTopWidth: 0,
+            backgroundColor: "white",
+            elevation: 5,
+          },
+        });
+      };
+    }, [navigation])
+  );
   useEffect(() => {
     if (id) fectchProductInfo(id);
     if (product) setProductInfo(product);
@@ -140,7 +158,7 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
         )}
 
         {/* Nút đánh dấu đã bán, chỉ hiển thị cho người bán */}
-        {isAdmin && !productInfo?.isSold &&(
+        {isAdmin && !productInfo?.isSold && (
           <TouchableOpacity
             style={styles.soldButton}
             onPress={handleMarkAsSold}

@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   },
   messageBtn: {
     borderRadius: 25,
-    backgroundColor: colors.active,
+    backgroundColor: colors.lightred,
     justifyContent: "center",
     alignItems: "center",
   },

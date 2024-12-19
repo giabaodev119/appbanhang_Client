@@ -83,7 +83,7 @@ const formatConversationToIMessage = (value?: Conversation): IMessage[] => {
 let timeoutId: NodeJS.Timeout | null;
 const TYPING_TIMEOUT = 2000;
 
-const ChatWindow: FC<Props> = ({ route }) => {
+const ChatWindow: FC<Props> = ({ navigation, route }) => {
   const { authState } = useAuth();
   const { conversationId, peerProfile } = route.params;
   const conversation = useSelector(selectConversationById(conversationId));
@@ -293,7 +293,24 @@ const ChatWindow: FC<Props> = ({ route }) => {
         socket.off("chat:message", updateSeenStatus);
         socket.off("chat:typing", updateTypingStatus);
       };
-    }, [])
+    }, [navigation])
+  );
+  useFocusEffect(
+    useCallback(() => {
+      navigation.getParent()?.setOptions({ tabBarStyle: { display: "none" } });
+      return () => {
+        // Hiện lại TabBar khi rời màn hình ChatWindow
+        navigation.getParent()?.setOptions({
+          tabBarStyle: {
+            height: 60,
+            position: "absolute",
+            borderTopWidth: 0,
+            backgroundColor: "white",
+            elevation: 5,
+          },
+        });
+      };
+    }, [navigation])
   );
 
   const renderMessageImage = (props: MessageImageProps<IMessage>) => {
