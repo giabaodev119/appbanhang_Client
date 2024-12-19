@@ -6,6 +6,7 @@ import {
   ScrollView,
   RefreshControl,
   Image,
+  Button,
 } from "react-native";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,6 +44,9 @@ const Home: FC<Props> = () => {
   const { authClient } = useClient();
   const { authState } = useAuth();
   const dispatch = useDispatch();
+  const [currentPage, setCurrentPage] = useState(1);
+const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn dữ liệu không
+
   const totalUnreadMessages = useSelector(getUnreadChatsCount);
 
   const banners = [
@@ -52,12 +56,18 @@ const Home: FC<Props> = () => {
   ];
 
   // Fetch dữ liệu sản phẩm
-  const fetchLatestProduct = async () => {
-    const res = await runAxiosAsync<{ products: LatestProduct[] }>(
-      authClient.get("/product/latest")
+  const fetchLatestProduct = async (page = 1) => {
+    const res = await runAxiosAsync<{ products: LatestProduct[]; pagination: { totalPages: number } }>(
+      authClient.get(`/product/latest?page=${page}&limit=20`)
     );
+  
     if (res?.products) {
-      setProducts(res.products.filter((p) => p.isActive && !p.isSold));
+      setProducts((prev) => [...prev, ...res.products.filter((p) => p.isActive && !p.isSold)]);
+  
+      // Kiểm tra nếu đã tải hết tất cả các trang
+      if (page >= res.pagination.totalPages) {
+        setHasMore(false);
+      }
     }
   };
 
@@ -83,6 +93,11 @@ const Home: FC<Props> = () => {
   // Làm mới dữ liệu
   const handleRefresh = async () => {
     setRefreshing(true);
+  setCurrentPage(1);
+  setHasMore(true);
+  setProducts([]); // Xóa danh sách cũ
+  await fetchLatestProduct(1); // Gọi lại trang đầu tiên
+  setRefreshing(false);
     await Promise.all([fetchLatestProduct(), fetchProductByAddress(), fetchFeaturedProducts()]);
     setRefreshing(false);
   };
@@ -162,10 +177,21 @@ const Home: FC<Props> = () => {
 
         {/* Latest Products */}
         <View style={styles.sectionContainer}>
-          <LatesProductList
-            data={products}
-            onPress={({ id }) => navigate("SingleProduct", { id })}
-          />
+        <LatesProductList
+    data={products}
+    onPress={({ id }) => navigate("SingleProduct", { id })}
+  />
+  {hasMore && (
+    <View style={styles.loadMoreContainer}>
+      <Button
+        title="Xem thêm"
+        onPress={() => {
+          setCurrentPage((prev) => prev + 1); // Tăng số trang hiện tại
+          fetchLatestProduct(currentPage + 1); // Gọi API với trang tiếp theo
+        }}
+      />
+    </View>
+  )}
         </View>
       </ScrollView>
 
@@ -223,6 +249,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
+  },
+  loadMoreContainer: {
+    marginTop: 10,
+    alignItems: "center",
   },
 });
 
