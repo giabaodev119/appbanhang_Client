@@ -71,9 +71,8 @@ const Home: FC<Props> = () => {
   };
 
   const fetchFeaturedProducts = async () => {
-    if (!authState.profile?.premiumStatus) return; // Chỉ gọi API nếu là Premium
     const res = await runAxiosAsync<{ products: LatestProduct[] }>(
-      authClient.get("/product/latest")
+      authClient.get("/product/premium-products")
     );
     if (res?.products) {
       setFeaturedProducts(res.products.filter((p) => p.isActive && !p.isSold));
@@ -83,7 +82,11 @@ const Home: FC<Props> = () => {
   // Làm mới dữ liệu
   const handleRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([fetchLatestProduct(), fetchProductByAddress(), fetchFeaturedProducts()]);
+    await Promise.all([
+      fetchLatestProduct(),
+      fetchProductByAddress(),
+      fetchFeaturedProducts(),
+    ]);
     setRefreshing(false);
   };
 
@@ -126,9 +129,18 @@ const Home: FC<Props> = () => {
         }
       >
         {/* Banner Swiper */}
-        <Swiper style={styles.swiper} autoplay autoplayTimeout={3} showsPagination>
+        <Swiper
+          style={styles.swiper}
+          autoplay
+          autoplayTimeout={3}
+          showsPagination
+        >
           {banners.map((banner) => (
-            <Image key={banner.id} source={banner.image} style={styles.bannerImage} />
+            <Image
+              key={banner.id}
+              source={banner.image}
+              style={styles.bannerImage}
+            />
           ))}
         </Swiper>
 
@@ -145,7 +157,7 @@ const Home: FC<Props> = () => {
             <ShowProduct
               title="Sản phẩm nổi bật"
               data={featuredProducts.slice(0, 4)}
-             // Hiển thị tối đa 4 sản phẩm
+              // Hiển thị tối đa 4 sản phẩm
               onPress={({ id }) => navigate("SingleProduct", { id })}
             />
           </View>

@@ -6,16 +6,14 @@ import colors from "@utils/color";
 interface Props {
   name: string;
   avatar?: string;
-  phoneNumber: string;
 }
 
-const PeerProfile: FC<Props> = ({ name, avatar, phoneNumber }) => {
+const PeerProfile: FC<Props> = ({ name, avatar }) => {
   return (
     <View style={styles.container}>
       <AvatarView size={40} uri={avatar} />
       <View style={styles.textContainer}>
         <Text style={styles.name}>{name}</Text>
-        <Text style={styles.phoneNumber}>{phoneNumber}</Text>
       </View>
     </View>
   );

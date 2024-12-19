@@ -7,8 +7,15 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   Image,
+  ImageBackgroundBase,
+  ImageBackground,
 } from "react-native";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import {
+  NavigationProp,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native";
 import { AppStackParamList } from "@navigator/AppNavigator";
 import colors from "@utils/color";
 import size from "@utils/size";
@@ -25,6 +32,8 @@ import BackButton from "@Ui/BackBotton";
 import { formatDate } from "@utils/date";
 
 const SellerDetail: FC = () => {
+  const imageUrl =
+    "https://cdn-media.sforum.vn/storage/app/media/ctv_seo3/mau-background-dep-3.jpg";
   const route = useRoute<RouteProp<AppStackParamList, "SellerDetail">>();
   const { id } = route.params;
 
@@ -32,6 +41,7 @@ const SellerDetail: FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("products");
+  const { navigate } = useNavigation<NavigationProp<AppStackParamList>>();
   const { authClient } = useClient();
 
   // Fetch dữ liệu từ backend
@@ -43,7 +53,6 @@ const SellerDetail: FC = () => {
         products: Product[];
       }>(authClient.get(`/product/get-byseller?id=${id}`));
       if (res) {
-        
         setSeller(res.owner);
         setProducts(res.products);
       } else {
@@ -75,33 +84,37 @@ const SellerDetail: FC = () => {
   }
 
   // Lọc sản phẩm theo trạng thái isSold
-  const availableProducts = products.filter((product) => product.isSold === false); // Sản phẩm chưa bán
+  const availableProducts = products.filter(
+    (product) => product.isSold === false
+  ); // Sản phẩm chưa bán
   const soldProducts = products.filter((product) => product.isSold === true); // Sản phẩm đã bán
-  
+
   return (
     <>
       <AppHeader backButton={<BackButton />} />
       <View style={styles.fullBackground}>
         <View style={styles.sellerHeader}>
-          {seller && (
-            <View style={styles.profileContainer}>
-              <AvatarView
-                uri={seller.avatar}
-                size={100}
-                isVip={seller.premiumStatus?.isAvailable}
-              />
-              <View style={styles.profileInfo}>
-                <Text style={styles.name}>{seller.name}</Text>
-                <Text style={styles.email}>{seller.email}</Text>
-                <Text style={styles.address}>
-                  Địa chỉ: {replacedAddress(seller.address)}
-                </Text>
-                <Text style={styles.createdAt}>
-                  Tạo tài khoản: {formatDate(seller.createdAt)}
-                </Text>
+          <ImageBackground source={{ uri: imageUrl }}>
+            {seller && (
+              <View style={styles.profileContainer}>
+                <AvatarView
+                  uri={seller.avatar}
+                  size={100}
+                  isVip={seller.premiumStatus?.isAvailable}
+                />
+                <View style={styles.profileInfo}>
+                  <Text style={styles.name}>{seller.name}</Text>
+                  <Text style={styles.email}>{seller.email}</Text>
+                  <Text style={styles.address}>
+                    Địa chỉ: {replacedAddress(seller.address)}
+                  </Text>
+                  <Text style={styles.createdAt}>
+                    Tạo tài khoản: {formatDate(seller.createdAt)}
+                  </Text>
+                </View>
               </View>
-            </View>
-          )}
+            )}
+          </ImageBackground>
         </View>
         <View style={styles.tabContainer}>
           <TouchableOpacity
@@ -136,7 +149,11 @@ const SellerDetail: FC = () => {
         </View>
         <ScrollView contentContainerStyle={styles.container}>
           {activeTab === "products" ? (
-            <ShowProduct data={products} title="Sản phẩm của người bán" />
+            <ShowProduct
+              data={products}
+              title="Sản phẩm của người bán"
+              onPress={({ id }) => navigate("SingleProduct", { id })}
+            />
           ) : (
             <View style={styles.soldProductSection}>
               <Text style={styles.productTitle}>Sản phẩm đã bán:</Text>
@@ -167,7 +184,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f4f4f4",
   },
   sellerHeader: {
-    backgroundColor: "#4a90e2",
     paddingBottom: 20,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,

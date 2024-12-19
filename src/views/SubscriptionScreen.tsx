@@ -55,11 +55,9 @@ type Props = NativeStackScreenProps<
 
 const SubscriptionScreen: FC<Props> = ({ navigation }) => {
   const [selectedPlan, setSelectedPlan] = useState<hv>(plans[0]);
-  const [htmlContent, setHtmlContent] = useState<string | any>(null);
   const { authState } = useAuth();
   const dispatch = useDispatch();
   const { authClient } = useClient();
-  const [busy, setBusy] = useState(false);
   const [input, setInput] = useState({
     amount: plans[0].price,
     bankCode: "VNBANK",
@@ -152,9 +150,9 @@ const SubscriptionScreen: FC<Props> = ({ navigation }) => {
       <View style={styles.container}>
         <Text style={styles.header}>Hãy lựa chọn gói hội viên cho bạn</Text>
         <Text style={styles.subHeader}>
-          Được ưu tiên đề xuất trên trang chính{"\n"}Thời gian đăng bán lâu hơn gấp 3 lần{"\n"}Không giới hạn bài đăng
           Được ưu tiên đề xuất trên trang chính{"\n"}Thời gian đăng bán lâu hơn
-          gấp 3 lần
+          gấp 3 lần{"\n"}Không giới hạn bài đăng Được ưu tiên đề xuất trên trang
+          chính{"\n"}Thời gian đăng bán lâu hơn gấp 3 lần
         </Text>
 
         {/* Plans */}

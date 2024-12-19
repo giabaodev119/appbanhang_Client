@@ -68,7 +68,7 @@ const TabNavigator = () => {
               Trang chủ
             </Text>
           ),
-          tabBarIcon: ({ color, size, focused }) => (
+          tabBarIcon: ({ size, focused }) => (
             <AntDesign
               name="home"
               size={size}
@@ -82,7 +82,6 @@ const TabNavigator = () => {
       <Tab.Screen
         name="NewListing"
         component={NewListing}
-        options={getOptions("pluscircleo")}
         listeners={{
           tabPress: (e) => {
             if (!isVerified) {
@@ -92,9 +91,10 @@ const TabNavigator = () => {
                 type: "warning",
               });
             }
-
+          },
+        }}
         options={{
-          tabBarLabel: ({ focused }) => (
+          tabBarLabel: () => (
             <Text
               style={{
                 color: colors.white,
@@ -134,7 +134,7 @@ const TabNavigator = () => {
               Hồ sơ
             </Text>
           ),
-          tabBarIcon: ({ color, size, focused }) => (
+          tabBarIcon: ({ size, focused }) => (
             <AntDesign
               name="user"
               size={size}
