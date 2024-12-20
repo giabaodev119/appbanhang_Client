@@ -67,22 +67,34 @@ const Home: FC = () => {
     }
     setIsLoading(false);
   };
-  const fetchProductByAddress = async () => {
-    const res = await runAxiosAsync<{ results: LatestProduct[] }>(
-      authClient.get("/product/get-byaddress")
+  const fetchProductByAddress = async (page = 1) => {
+    if (isLoading) return;
+  
+    setIsLoading(true);
+    const res = await runAxiosAsync<{ results: LatestProduct[]; pagination: { totalPages: number } }>(
+      authClient.get(`/product/get-byaddress?page=${page}&limit=4`) // Thêm phân trang
     );
+  
     if (res?.results) {
-      setProductsByAddress(res.results.filter((p) => p.isActive && !p.isSold));
+      setProductsByAddress((prev) => [...prev, ...res.results.filter((p) => p.isActive && !p.isSold)]);
+      if (page >= res.pagination.totalPages) setHasMore(false);
     }
+    setIsLoading(false);
   };
 
-  const fetchFeaturedProducts = async () => {
-    const res = await runAxiosAsync<{ products: LatestProduct[] }>(
-      authClient.get("/product/premium-products")
+  const fetchFeaturedProducts = async (page = 1) => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    const res = await runAxiosAsync<{ products: LatestProduct[]; pagination: { totalPages: number } }>(
+      authClient.get(`/product/premium-products?page=${page}&limit=4`) // Thêm phân trang
     );
+    
     if (res?.products) {
-      setFeaturedProducts(res.products.filter((p) => p.isActive && !p.isSold));
+      setFeaturedProducts((prev) => [...prev, ...res.products.filter((p) => p.isActive && !p.isSold)]);
+      if (page >= res.pagination.totalPages) setHasMore(false);
     }
+    setIsLoading(false);
   };
 
   const handleRefresh = async () => {
@@ -139,24 +151,57 @@ const Home: FC = () => {
         </View>
 
         {authState.profile?.premiumStatus && featuredProducts.length > 0 && (
-          <View style={styles.sectionContainer}>
-            <ShowProduct
-              title="Sản phẩm nổi bật"
-              data={featuredProducts.slice(0, 4)}
-              onPress={({ id }) => navigate("SingleProduct", { id })}
-            />
-          </View>
-        )}
+  <View style={styles.sectionContainer}>
+    <ShowProduct
+      title="Sản phẩm nổi bật"
+      data={featuredProducts.slice(0, 4)}
+      onPress={({ id }) => navigate("SingleProduct", { id })}
+    />
+    {hasMore && !isLoading && (
+      <View style={styles.loadMoreContainer}>
+        <View style={styles.buttonWrapper}>
+          <Button
+            title="Xem thêm"
+            onPress={() => {
+              setCurrentPage((prev) => prev + 1); // Tăng trang hiện tại
+              fetchFeaturedProducts(); // Gọi hàm tải sản phẩm nổi bật
+            }}
+            color={colors.primary}
+          />
+        </View>
+      </View>
+    )}
+    {isLoading && <ActivityIndicator size="small" color={colors.primary} />}
+    {!hasMore && <Text style={styles.noMoreText}>Không còn sản phẩm nào</Text>}
+  </View>
+)}
 
-        {productsByAddress && productsByAddress.length > 0 && (
-          <View style={styles.sectionContainer}>
-            <ShowProduct
-              title="Sản phẩm gần bạn"
-              data={productsByAddress.slice(0, 4)}
-              onPress={({ id }) => navigate("SingleProduct", { id })}
-            />
-          </View>
-        )}
+{productsByAddress && productsByAddress.length > 0 && (
+  <View style={styles.sectionContainer}>
+    <ShowProduct
+      title="Sản phẩm gần bạn"
+      data={productsByAddress.slice(0, 4)}
+      onPress={({ id }) => navigate("SingleProduct", { id })}
+    />
+    {hasMore && !isLoading && (
+      <View style={styles.loadMoreContainer}>
+        <View style={styles.buttonWrapper}>
+          <Button
+            title="Xem thêm"
+            onPress={() => {
+              setCurrentPage((prev) => prev + 1); // Tăng trang hiện tại
+              fetchProductByAddress(); // Gọi hàm tải sản phẩm gần bạn
+            }}
+            color={colors.primary}
+          />
+        </View>
+      </View>
+    )}
+    {isLoading && <ActivityIndicator size="small" color={colors.primary} />}
+    {!hasMore && <Text style={styles.noMoreText}>Không còn sản phẩm nào</Text>}
+  </View>
+)}
+
 
         <View style={styles.sectionContainer}>
           <LatesProductList
@@ -241,10 +286,10 @@ const styles = StyleSheet.create({
   buttonWrapper: {
     borderWidth: 1,
     borderColor: colors.primary,
-    borderRadius: 20,
-    paddingVertical: 10, // Điều chỉnh padding để chữ lên trên
-    paddingHorizontal: 20,
-    marginTop: -50, // Đưa nút lên trên
+    borderRadius: 50,
+    paddingVertical: -10, // Điều chỉnh padding để chữ lên trên
+    paddingHorizontal: 50,
+    marginTop: 20, // Đưa nút lên trên
   },
 });
 
