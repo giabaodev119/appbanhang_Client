@@ -53,6 +53,8 @@ const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn d
     { id: 1, image: require("../../assets/images (5).png") },
     { id: 2, image: require("../../assets/images (6).png") },
     { id: 3, image: require("../../assets/images (7).png") },
+    { id: 4, image: require("../../assets/images (8).png") },
+    { id: 5, image: require("../../assets/images (9).png") },
   ];
 
   // Fetch dữ liệu sản phẩm
@@ -92,20 +94,20 @@ const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn d
   // Làm mới dữ liệu
   const handleRefresh = async () => {
     setRefreshing(true);
-<<<<<<< HEAD
+
   setCurrentPage(1);
   setHasMore(true);
   setProducts([]); // Xóa danh sách cũ
   await fetchLatestProduct(1); // Gọi lại trang đầu tiên
   setRefreshing(false);
     await Promise.all([fetchLatestProduct(), fetchProductByAddress(), fetchFeaturedProducts()]);
-=======
+
     await Promise.all([
       fetchLatestProduct(),
       fetchProductByAddress(),
       fetchFeaturedProducts(),
     ]);
->>>>>>> origin/main
+
     setRefreshing(false);
   };
 
@@ -151,7 +153,7 @@ const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn d
         <Swiper
           style={styles.swiper}
           autoplay
-          autoplayTimeout={3}
+          autoplayTimeout={5}
           showsPagination
         >
           {banners.map((banner) => (
@@ -198,7 +200,7 @@ const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn d
 
         {/* Latest Products */}
         <View style={styles.sectionContainer}>
-<<<<<<< HEAD
+
         <LatesProductList
     data={products}
     onPress={({ id }) => navigate("SingleProduct", { id })}
@@ -214,14 +216,14 @@ const [hasMore, setHasMore] = useState(true); // Trạng thái kiểm tra còn d
       />
     </View>
   )}
-=======
+
           <LatesProductList
             data={products
               .filter((product) => product.isActive)
               .filter((p) => !p.isSold)}
             onPress={({ id }) => navigate("SingleProduct", { id })}
           />
->>>>>>> origin/main
+
         </View>
       </ScrollView>
 
@@ -289,17 +291,17 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-<<<<<<< HEAD
+
   loadMoreContainer: {
     marginTop: 10,
     alignItems: "center",
-=======
+  },
   title: {
     fontSize: 20,
     fontWeight: "bold",
     color: colors.primary,
     marginBottom: 10,
->>>>>>> origin/main
+
   },
 });
 
