@@ -1,4 +1,3 @@
-// Cập nhật import
 import React, { FC, useEffect, useState } from "react";
 import {
   View,
@@ -6,39 +5,39 @@ import {
   ScrollView,
   RefreshControl,
   Image,
+  Button,
+  ActivityIndicator,
+  Text,
 } from "react-native";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  ActiveChat,
-  addNewActiveChats,
-  getUnreadChatsCount,
-} from "@store/chats";
+import { getUnreadChatsCount } from "@store/chats";
 import ChatNotification from "@Ui/ChatNotification";
 import socket, { handleSocketConnection } from "src/socket";
 import { runAxiosAsync } from "@api/runAxiosAsync";
 import CategoryList from "@conponents/CategoryList";
 import LatesProductList, { LatestProduct } from "@conponents/LatesProductList";
-
 import SearchBar from "@conponents/SearchBar";
 import SearchAddressButton from "@conponents/SearchAddressButton";
 import SearchModal from "@conponents/SearchModal";
 import ShowProduct from "@conponents/SearchProduct";
-import Swiper from "react-native-swiper"; // Import Swiper
+import Swiper from "react-native-swiper";
 import useAuth from "@hooks/useAuth";
 import useClient from "@hooks/useClient";
 import { AppStackParamList } from "@navigator/AppNavigator";
 import size from "@utils/size";
 import colors from "@utils/color";
 
-interface Props {}
 
-const Home: FC<Props> = () => {
+const Home: FC = () => {
   const [products, setProducts] = useState<LatestProduct[]>([]);
-  const [productsByAddress, setProductsByAddress] = useState<LatestProduct[]>();
+  const [productsByAddress, setProductsByAddress] = useState<LatestProduct[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<LatestProduct[]>([]);
-  const [showSearchModal, setShowSearchModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
   const { navigate } = useNavigation<NavigationProp<AppStackParamList>>();
   const { authClient } = useClient();
   const { authState } = useAuth();
@@ -49,49 +48,66 @@ const Home: FC<Props> = () => {
     { id: 1, image: require("../../assets/images (5).png") },
     { id: 2, image: require("../../assets/images (6).png") },
     { id: 3, image: require("../../assets/images (7).png") },
+    { id: 4, image: require("../../assets/images (8).png") },
+    { id: 5, image: require("../../assets/images (9).png") },
   ];
 
-  // Fetch dữ liệu sản phẩm
-  const fetchLatestProduct = async () => {
-    const res = await runAxiosAsync<{ products: LatestProduct[] }>(
-      authClient.get("/product/latest")
-    );
+  const fetchLatestProduct = async (page = 1) => {
+    if (isLoading) return;
+  
+    setIsLoading(true);
+    const res = await runAxiosAsync<{
+      products: LatestProduct[];
+      pagination: { totalPages: number };
+    }>(authClient.get(`/product/latest?page=${page}&limit=10`)); // Giới hạn ở đây là 10 sản phẩm mỗi lần gọi API
+  
     if (res?.products) {
-      setProducts(res.products.filter((p) => p.isActive && !p.isSold));
+      setProducts((prev) => [...prev, ...res.products.filter((p) => p.isActive && !p.isSold)]);
+      if (page >= res.pagination.totalPages) setHasMore(false);
     }
+    setIsLoading(false);
   };
-
-  const fetchProductByAddress = async () => {
-    const res = await runAxiosAsync<{ results: LatestProduct[] }>(
-      authClient.get("/product/get-byaddress")
+  const fetchProductByAddress = async (page = 1) => {
+    if (isLoading) return;
+  
+    setIsLoading(true);
+    const res = await runAxiosAsync<{ results: LatestProduct[]; pagination: { totalPages: number } }>(
+      authClient.get(`/product/get-byaddress?page=${page}&limit=4`) // Thêm phân trang
     );
+  
     if (res?.results) {
-      setProductsByAddress(res.results.filter((p) => p.isActive && !p.isSold));
+      setProductsByAddress((prev) => [...prev, ...res.results.filter((p) => p.isActive && !p.isSold)]);
+      if (page >= res.pagination.totalPages) setHasMore(false);
     }
+    setIsLoading(false);
   };
 
-  const fetchFeaturedProducts = async () => {
-    const res = await runAxiosAsync<{ products: LatestProduct[] }>(
-      authClient.get("/product/premium-products")
+  const fetchFeaturedProducts = async (page = 1) => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    const res = await runAxiosAsync<{ products: LatestProduct[]; pagination: { totalPages: number } }>(
+      authClient.get(`/product/premium-products?page=${page}&limit=4`) // Thêm phân trang
     );
+    
     if (res?.products) {
-      setFeaturedProducts(res.products.filter((p) => p.isActive && !p.isSold));
+      setFeaturedProducts((prev) => [...prev, ...res.products.filter((p) => p.isActive && !p.isSold)]);
+      if (page >= res.pagination.totalPages) setHasMore(false);
     }
+    setIsLoading(false);
   };
 
-  // Làm mới dữ liệu
   const handleRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([
-      fetchLatestProduct(),
-      fetchProductByAddress(),
-      fetchFeaturedProducts(),
-    ]);
+    setCurrentPage(1);
+    setHasMore(true);
+    setProducts([]);
+    await Promise.all([fetchLatestProduct(1), fetchProductByAddress(), fetchFeaturedProducts()]);
     setRefreshing(false);
   };
 
   useEffect(() => {
-    handleRefresh(); // Gọi khi khởi tạo component
+    handleRefresh();
   }, []);
 
   useEffect(() => {
@@ -103,11 +119,8 @@ const Home: FC<Props> = () => {
     };
   }, []);
 
-  useEffect(() => {}, [products]);
-
   return (
     <>
-      {/* Header */}
       <View style={styles.headerContainer}>
         <View style={styles.searchBarContainer}>
           <SearchBar asButton onPress={() => setShowSearchModal(true)} />
@@ -121,75 +134,101 @@ const Home: FC<Props> = () => {
         />
       </View>
 
-      {/* Main Content */}
       <ScrollView
         style={styles.container}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
-        {/* Banner Swiper */}
-        <Swiper
-          style={styles.swiper}
-          autoplay
-          autoplayTimeout={3}
-          showsPagination
-        >
+        <Swiper style={styles.swiper} autoplay autoplayTimeout={5} showsPagination>
           {banners.map((banner) => (
-            <Image
-              key={banner.id}
-              source={banner.image}
-              style={styles.bannerImage}
-            />
+            <Image key={banner.id} source={banner.image} style={styles.bannerImage} />
           ))}
         </Swiper>
 
-        {/* Categories */}
         <View style={styles.sectionContainer}>
-          <CategoryList
-            onPress={(category) => navigate("ProductList", { category })}
-          />
+          <CategoryList onPress={(category) => navigate("ProductList", { category })} />
         </View>
 
-        {/* Featured Products */}
         {authState.profile?.premiumStatus && featuredProducts.length > 0 && (
-          <View style={styles.sectionContainer}>
-            <ShowProduct
-              title="Sản phẩm nổi bật"
-              data={featuredProducts.slice(0, 4)}
-              // Hiển thị tối đa 4 sản phẩm
-              onPress={({ id }) => navigate("SingleProduct", { id })}
-            />
-          </View>
-        )}
+  <View style={styles.sectionContainer}>
+    <ShowProduct
+      title="Sản phẩm nổi bật"
+      data={featuredProducts.slice(0, 4)}
+      onPress={({ id }) => navigate("SingleProduct", { id })}
+    />
+    {hasMore && !isLoading && (
+      <View style={styles.loadMoreContainer}>
+        <View style={styles.buttonWrapper}>
+          <Button
+            title="Xem thêm"
+            onPress={() => {
+              setCurrentPage((prev) => prev + 1); // Tăng trang hiện tại
+              fetchFeaturedProducts(); // Gọi hàm tải sản phẩm nổi bật
+            }}
+            color={colors.primary}
+          />
+        </View>
+      </View>
+    )}
+    {isLoading && <ActivityIndicator size="small" color={colors.primary} />}
+    {!hasMore && <Text style={styles.noMoreText}>Không còn sản phẩm nào</Text>}
+  </View>
+)}
 
-        {/* Nearby Products */}
-        {productsByAddress && productsByAddress.length > 0 && (
-          <View style={styles.sectionContainer}>
-            <ShowProduct
-              title="Sản phẩm gần bạn"
-              data={productsByAddress
-                .filter((product) => product.isActive)
-                .filter((p) => !p.isSold)
-                .slice(0, 4)}
-              onPress={({ id }) => navigate("SingleProduct", { id })}
-            />
-          </View>
-        )}
+{productsByAddress && productsByAddress.length > 0 && (
+  <View style={styles.sectionContainer}>
+    <ShowProduct
+      title="Sản phẩm gần bạn"
+      data={productsByAddress.slice(0, 4)}
+      onPress={({ id }) => navigate("SingleProduct", { id })}
+    />
+    {hasMore && !isLoading && (
+      <View style={styles.loadMoreContainer}>
+        <View style={styles.buttonWrapper}>
+          <Button
+            title="Xem thêm"
+            onPress={() => {
+              setCurrentPage((prev) => prev + 1); // Tăng trang hiện tại
+              fetchProductByAddress(); // Gọi hàm tải sản phẩm gần bạn
+            }}
+            color={colors.primary}
+          />
+        </View>
+      </View>
+    )}
+    {isLoading && <ActivityIndicator size="small" color={colors.primary} />}
+    {!hasMore && <Text style={styles.noMoreText}>Không còn sản phẩm nào</Text>}
+  </View>
+)}
 
-        {/* Latest Products */}
+
         <View style={styles.sectionContainer}>
           <LatesProductList
-            data={products
-              .filter((product) => product.isActive)
-              .filter((p) => !p.isSold)}
+             data={products.slice(0, 10)}
             onPress={({ id }) => navigate("SingleProduct", { id })}
           />
+          {isLoading && <ActivityIndicator size="small" color={colors.primary} />}
+          {!hasMore && <Text style={styles.noMoreText}>Không còn sản phẩm nào</Text>}
+          {hasMore && !isLoading && (
+  <View style={styles.loadMoreContainer}>
+    <View style={styles.buttonWrapper}>
+      <Button
+        title="Xem thêm"
+        onPress={() => {
+          setCurrentPage((prev) => prev + 1);
+          fetchLatestProduct(currentPage + 1);
+        }}
+        color={colors.primary}
+      />
+    </View>
+  </View>
+)}
+
         </View>
       </ScrollView>
 
-      {/* Search Modal */}
-      <SearchModal visible={showSearchModal} onClose={setShowSearchModal} />
+      <SearchModal visible={showSearchModal} onClose={() => setShowSearchModal(false)} />
     </>
   );
 };
@@ -206,19 +245,12 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     marginBottom: 10,
     paddingHorizontal: 10,
-    backgroundColor: colors.white, // Header nổi bật với màu chính
+    backgroundColor: colors.white,
   },
   searchBarContainer: {
     flex: 6,
     marginRight: 10,
     marginLeft: 10,
-    backgroundColor: colors.white, // Nền trắng cho sự đơn giản
-    borderRadius: 10,
-    shadowColor: colors.backDropDark,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 4,
   },
   searchAddressButtonContainer: {
     flex: 1,
@@ -228,17 +260,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderRadius: 10,
     overflow: "hidden",
-    shadowColor: colors.backDropDark,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2, // Tăng độ rõ của bóng
-    shadowRadius: 6,
-    elevation: 5,
   },
   bannerImage: {
     width: "100%",
     height: "100%",
     resizeMode: "cover",
-    borderRadius: 10,
   },
   sectionContainer: {
     marginBottom: 25,
@@ -246,17 +272,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     backgroundColor: colors.white,
     borderRadius: 10,
-    shadowColor: colors.backDropDark,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
+  loadMoreContainer: {
+    marginTop: 50,
+    alignItems: "center",
     color: colors.primary,
-    marginBottom: 10,
+  },
+  noMoreText: {
+    textAlign: "center",
+    color: colors.primary,
+    marginTop: 10,
+  },
+  buttonWrapper: {
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: 50,
+    paddingVertical: -10, // Điều chỉnh padding để chữ lên trên
+    paddingHorizontal: 50,
+    marginTop: 20, // Đưa nút lên trên
   },
 });
 
