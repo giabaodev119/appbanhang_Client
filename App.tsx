@@ -10,6 +10,7 @@ import FlashMessage from "react-native-flash-message";
 import { Provider } from "react-redux";
 import store from "@store/index";
 import colors from "@utils/color";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function App() {
   return (

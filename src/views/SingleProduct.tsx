@@ -185,16 +185,16 @@ const SingleProduct: FC<Props> = ({ route, navigation }) => {
           </View>
         )}
 
-        {!isAdmin && productInfo?.seller.phoneNumber && (
-          <PhoneIcon onPress={onCallSeller} />
-        )}
-        {!isAdmin && (
+        {!isAdmin &&
+          productInfo?.seller.phoneNumber &&
+          authState.profile?.verified && <PhoneIcon onPress={onCallSeller} />}
+        {!isAdmin && authState.profile?.verified && (
           <ChatIcon onPress={onChatBtnPress} busy={fetchingChatID} />
         )}
         {/* Nút gọi điện chỉ hiển thị cho người mua */}
 
         {/* Nút lưu sản phẩm, chỉ hiển thị cho người mua */}
-        {!isAdmin && (
+        {!isAdmin && authState.profile?.verified && (
           <TouchableOpacity
             style={[
               styles.saveButton,

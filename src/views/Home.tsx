@@ -28,10 +28,11 @@ import { AppStackParamList } from "@navigator/AppNavigator";
 import size from "@utils/size";
 import colors from "@utils/color";
 
-
 const Home: FC = () => {
   const [products, setProducts] = useState<LatestProduct[]>([]);
-  const [productsByAddress, setProductsByAddress] = useState<LatestProduct[]>([]);
+  const [productsByAddress, setProductsByAddress] = useState<LatestProduct[]>(
+    []
+  );
   const [featuredProducts, setFeaturedProducts] = useState<LatestProduct[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,29 +55,38 @@ const Home: FC = () => {
 
   const fetchLatestProduct = async (page = 1) => {
     if (isLoading) return;
-  
+
     setIsLoading(true);
     const res = await runAxiosAsync<{
       products: LatestProduct[];
       pagination: { totalPages: number };
     }>(authClient.get(`/product/latest?page=${page}&limit=10`)); // Giới hạn ở đây là 10 sản phẩm mỗi lần gọi API
-  
+
     if (res?.products) {
-      setProducts((prev) => [...prev, ...res.products.filter((p) => p.isActive && !p.isSold)]);
+      setProducts((prev) => [
+        ...prev,
+        ...res.products.filter((p) => p.isActive && !p.isSold),
+      ]);
       if (page >= res.pagination.totalPages) setHasMore(false);
     }
     setIsLoading(false);
   };
   const fetchProductByAddress = async (page = 1) => {
     if (isLoading) return;
-  
+
     setIsLoading(true);
-    const res = await runAxiosAsync<{ results: LatestProduct[]; pagination: { totalPages: number } }>(
+    const res = await runAxiosAsync<{
+      results: LatestProduct[];
+      pagination: { totalPages: number };
+    }>(
       authClient.get(`/product/get-byaddress?page=${page}&limit=4`) // Thêm phân trang
     );
-  
+
     if (res?.results) {
-      setProductsByAddress((prev) => [...prev, ...res.results.filter((p) => p.isActive && !p.isSold)]);
+      setProductsByAddress((prev) => [
+        ...prev,
+        ...res.results.filter((p) => p.isActive && !p.isSold),
+      ]);
       if (page >= res.pagination.totalPages) setHasMore(false);
     }
     setIsLoading(false);
@@ -84,14 +94,20 @@ const Home: FC = () => {
 
   const fetchFeaturedProducts = async (page = 1) => {
     if (isLoading) return;
-    
+
     setIsLoading(true);
-    const res = await runAxiosAsync<{ products: LatestProduct[]; pagination: { totalPages: number } }>(
+    const res = await runAxiosAsync<{
+      products: LatestProduct[];
+      pagination: { totalPages: number };
+    }>(
       authClient.get(`/product/premium-products?page=${page}&limit=4`) // Thêm phân trang
     );
-    
+
     if (res?.products) {
-      setFeaturedProducts((prev) => [...prev, ...res.products.filter((p) => p.isActive && !p.isSold)]);
+      setFeaturedProducts((prev) => [
+        ...prev,
+        ...res.products.filter((p) => p.isActive && !p.isSold),
+      ]);
       if (page >= res.pagination.totalPages) setHasMore(false);
     }
     setIsLoading(false);
@@ -102,7 +118,11 @@ const Home: FC = () => {
     setCurrentPage(1);
     setHasMore(true);
     setProducts([]);
-    await Promise.all([fetchLatestProduct(1), fetchProductByAddress(), fetchFeaturedProducts()]);
+    await Promise.all([
+      fetchLatestProduct(1),
+      fetchProductByAddress(),
+      fetchFeaturedProducts(),
+    ]);
     setRefreshing(false);
   };
 
@@ -140,95 +160,119 @@ const Home: FC = () => {
           <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
         }
       >
-        <Swiper style={styles.swiper} autoplay autoplayTimeout={5} showsPagination>
+        <Swiper
+          style={styles.swiper}
+          autoplay
+          autoplayTimeout={5}
+          showsPagination
+        >
           {banners.map((banner) => (
-            <Image key={banner.id} source={banner.image} style={styles.bannerImage} />
+            <Image
+              key={banner.id}
+              source={banner.image}
+              style={styles.bannerImage}
+            />
           ))}
         </Swiper>
 
         <View style={styles.sectionContainer}>
-          <CategoryList onPress={(category) => navigate("ProductList", { category })} />
+          <CategoryList
+            onPress={(category) => navigate("ProductList", { category })}
+          />
         </View>
 
         {authState.profile?.premiumStatus && featuredProducts.length > 0 && (
-  <View style={styles.sectionContainer}>
-    <ShowProduct
-      title="Sản phẩm nổi bật"
-      data={featuredProducts.slice(0, 4)}
-      onPress={({ id }) => navigate("SingleProduct", { id })}
-    />
-    {hasMore && !isLoading && (
-      <View style={styles.loadMoreContainer}>
-        <View style={styles.buttonWrapper}>
-          <Button
-            title="Xem thêm"
-            onPress={() => {
-              setCurrentPage((prev) => prev + 1); // Tăng trang hiện tại
-              fetchFeaturedProducts(); // Gọi hàm tải sản phẩm nổi bật
-            }}
-            color={colors.primary}
-          />
-        </View>
-      </View>
-    )}
-    {isLoading && <ActivityIndicator size="small" color={colors.primary} />}
-    {!hasMore && <Text style={styles.noMoreText}>Không còn sản phẩm nào</Text>}
-  </View>
-)}
+          <View style={styles.sectionContainer}>
+            <ShowProduct
+              title="Sản phẩm nổi bật"
+              data={featuredProducts.slice(0, 4)}
+              onPress={({ id }) => navigate("SingleProduct", { id })}
+            />
+            {hasMore && !isLoading && (
+              <View style={styles.loadMoreContainer}>
+                <View style={styles.buttonWrapper}>
+                  <Button
+                    title="Xem thêm"
+                    onPress={() => {
+                      setCurrentPage((prev) => prev + 1); // Tăng trang hiện tại
+                      fetchFeaturedProducts(); // Gọi hàm tải sản phẩm nổi bật
+                    }}
+                    color={colors.primary}
+                  />
+                </View>
+              </View>
+            )}
+            {isLoading && (
+              <ActivityIndicator size="small" color={colors.primary} />
+            )}
+            {!hasMore && (
+              <Text style={styles.noMoreText}>Không còn sản phẩm nào</Text>
+            )}
+          </View>
+        )}
 
-{productsByAddress && productsByAddress.length > 0 && (
-  <View style={styles.sectionContainer}>
-    <ShowProduct
-      title="Sản phẩm gần bạn"
-      data={productsByAddress.slice(0, 4)}
-      onPress={({ id }) => navigate("SingleProduct", { id })}
-    />
-    {hasMore && !isLoading && (
-      <View style={styles.loadMoreContainer}>
-        <View style={styles.buttonWrapper}>
-          <Button
-            title="Xem thêm"
-            onPress={() => {
-              setCurrentPage((prev) => prev + 1); // Tăng trang hiện tại
-              fetchProductByAddress(); // Gọi hàm tải sản phẩm gần bạn
-            }}
-            color={colors.primary}
-          />
-        </View>
-      </View>
-    )}
-    {isLoading && <ActivityIndicator size="small" color={colors.primary} />}
-    {!hasMore && <Text style={styles.noMoreText}>Không còn sản phẩm nào</Text>}
-  </View>
-)}
-
+        {productsByAddress && productsByAddress.length > 0 && (
+          <View style={styles.sectionContainer}>
+            <ShowProduct
+              title="Sản phẩm gần bạn"
+              data={productsByAddress.slice(0, 4)}
+              onPress={({ id }) => navigate("SingleProduct", { id })}
+            />
+            {hasMore && !isLoading && (
+              <View style={styles.loadMoreContainer}>
+                <View style={styles.buttonWrapper}>
+                  <Button
+                    title="Xem thêm"
+                    onPress={() => {
+                      setCurrentPage((prev) => prev + 1); // Tăng trang hiện tại
+                      fetchProductByAddress(); // Gọi hàm tải sản phẩm gần bạn
+                    }}
+                    color={colors.primary}
+                  />
+                </View>
+              </View>
+            )}
+            {isLoading && (
+              <ActivityIndicator size="small" color={colors.primary} />
+            )}
+            {!hasMore && (
+              <Text style={styles.noMoreText}>Không còn sản phẩm nào</Text>
+            )}
+          </View>
+        )}
 
         <View style={styles.sectionContainer}>
           <LatesProductList
-             data={products.slice(0, 10)}
+            data={products.slice(0, 10)}
             onPress={({ id }) => navigate("SingleProduct", { id })}
           />
-          {isLoading && <ActivityIndicator size="small" color={colors.primary} />}
-          {!hasMore && <Text style={styles.noMoreText}>Không còn sản phẩm nào</Text>}
+          {isLoading && (
+            <ActivityIndicator size="small" color={colors.primary} />
+          )}
+          {!hasMore && (
+            <Text style={styles.noMoreText}>Không còn sản phẩm nào</Text>
+          )}
           {hasMore && !isLoading && (
-  <View style={styles.loadMoreContainer}>
-    <View style={styles.buttonWrapper}>
-      <Button
-        title="Xem thêm"
-        onPress={() => {
-          setCurrentPage((prev) => prev + 1);
-          fetchLatestProduct(currentPage + 1);
-        }}
-        color={colors.primary}
-      />
-    </View>
-  </View>
-)}
-
+            <View style={styles.loadMoreContainer}>
+              <View style={styles.buttonWrapper}>
+                <Button
+                  title="Xem thêm"
+                  onPress={() => {
+                    setCurrentPage((prev) => prev + 1);
+                    fetchLatestProduct(currentPage + 1);
+                  }}
+                  color={colors.primary}
+                />
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
 
-      <SearchModal visible={showSearchModal} onClose={() => setShowSearchModal(false)} />
+      <SearchModal
+        visible={showSearchModal}
+        onClose={() => setShowSearchModal(false)}
+      />
     </>
   );
 };
