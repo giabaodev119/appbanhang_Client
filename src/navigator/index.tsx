@@ -32,6 +32,7 @@ export type ProfileRes = {
     isAdmin: boolean;
     isActive: boolean;
     avatar?: string;
+    phoneNumber: string;
   };
 };
 interface Props {}
